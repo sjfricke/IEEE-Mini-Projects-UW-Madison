@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<title>IEEE Socket Pokemon</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+<script src="/socket.io/socket.io.js"></script>
+<script src="/lib/jquery.min.js"></script>
+<script src="/lib/three.min.js"></script>
+<script src="/lib/ThreeJs_Extra/controls/OrbitControls.js"></script>
+<script src="/lib/ThreeJs_Extra/controls/MouseControls.js"></script>
+<script src="/lib/ThreeJs_Extra/loaders/ColladaLoader.js"></script>
+<script src="/lib/ThreeJs_Extra/loaders/MTLLoader.js"></script>
+<script src="/lib/ThreeJs_Extra/loaders/OBJLoader.js"></script>
+<script src="/lib/ThreeJs_Extra/loaders/FBXLoader.js"></script>
+    
+<script> var deviceID = "<%= device %>"; console.log("Device ID: " + deviceID); </script>
+</head>
+<body>
+</body>
+    
+<script src="/javascript/main.js"></script>
+<script src="/javascript/map.js"></script>
+<script>
+//inital call to set everything in motion
+//called after everything is initalized
+//will be called once database is updated with the device's info
+socket.on('initalize', function(data){    
+    init(data); 
+    animate();
+});    
+</script>
+
+</html>

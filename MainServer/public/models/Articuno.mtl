@@ -1,0 +1,338 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 22.05.2016 16:30:41
+
+newmtl Material_119_5BE938E3_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\5BE938E3_c.png
+	map_Kd images\\Articuno\\5BE938E3_c.png
+
+newmtl Material_118_1A7C5842_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\1A7C5842_c.png
+	map_Kd images\\Articuno\\1A7C5842_c.png
+
+newmtl Material_117_91E8B2E_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\91E8B2E_c.png
+	map_Kd images\\Articuno\\91E8B2E_c.png
+
+newmtl Material_116_26614ED4_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\26614ED4_c.png
+	map_Kd images\\Articuno\\26614ED4_c.png
+
+newmtl Material_115_5BE938E3_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\5BE938E3_c.png
+	map_Kd images\\Articuno\\5BE938E3_c.png
+
+newmtl Material_114_1A7C5842_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\1A7C5842_c.png
+	map_Kd images\\Articuno\\1A7C5842_c.png
+
+newmtl Material_113_6028521D_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\6028521D_c.png
+	map_Kd images\\Articuno\\6028521D_c.png
+
+newmtl Material_112_2A34339_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\2A34339_c.png
+	map_Kd images\\Articuno\\2A34339_c.png
+
+newmtl Material_111_18321A38_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\18321A38_c.png
+	map_Kd images\\Articuno\\18321A38_c.png
+
+newmtl Material_110_2A34339_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\2A34339_c.png
+	map_Kd images\\Articuno\\2A34339_c.png
+
+newmtl Material_109_18321A38_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\18321A38_c.png
+	map_Kd images\\Articuno\\18321A38_c.png
+
+newmtl Material_108_38761E99_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\38761E99_c.png
+	map_Kd images\\Articuno\\38761E99_c.png
+
+newmtl Material_107_38761E99_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\38761E99_c.png
+	map_Kd images\\Articuno\\38761E99_c.png
+
+newmtl Material_106_38761E99_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\38761E99_c.png
+	map_Kd images\\Articuno\\38761E99_c.png
+
+newmtl Material_105_38761E99_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\38761E99_c.png
+	map_Kd images\\Articuno\\38761E99_c.png
+
+newmtl Material_117_70490163_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\70490163_c.png
+	map_Kd images\\Articuno\\70490163_c.png
+
+newmtl Material_117_6322AE8C_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\6322AE8C_c.png
+	map_Kd images\\Articuno\\6322AE8C_c.png
+
+newmtl Material_117_1FB543E3_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\1FB543E3_c.png
+	map_Kd images\\Articuno\\1FB543E3_c.png
+
+newmtl Material_117_52AF8AD3_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\52AF8AD3_c.png
+	map_Kd images\\Articuno\\52AF8AD3_c.png
+
+newmtl Material_117_60B7055B_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\60B7055B_c.png
+	map_Kd images\\Articuno\\60B7055B_c.png
+
+newmtl Material_117_52F0CF38_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\52F0CF38_c.png
+	map_Kd images\\Articuno\\52F0CF38_c.png
+
+newmtl Material_117_26614ED4_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\26614ED4_c.png
+	map_Kd images\\Articuno\\26614ED4_c.png
+
+newmtl Material_117_2A34339_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\2A34339_c.png
+	map_Kd images\\Articuno\\2A34339_c.png
+
+newmtl Material_117_18321A38_c_png
+	Ns 0.00
+	Ni 1.50
+	d 1.00
+	Tr 0.00
+	Tf 1.00 1.00 1.00 
+	illum 2
+	Ka 0.00 0.00 0.00
+	Kd 1.0 1.0 1.0
+	Ks 0.00 0.00 0.00
+	Ke 0.00 0.00 0.00
+	map_Ka images\\Articuno\\18321A38_c.png
+	map_Kd images\\Articuno\\18321A38_c.png

@@ -1,0 +1,16 @@
+{
+    "device" : 0,
+    "online" : false,
+    "x" : 0,
+    "z" : 0,
+    "mode" : "0",
+    "score" : 0,
+    "coins" : 100,
+    "items" : {
+            "Potion" : 1,
+            "Super Potion" : 0,
+            "Pokeball" : 6,
+            "Greatball" : 1,
+            "Ultraball" : 0    
+    }
+}

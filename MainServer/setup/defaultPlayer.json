@@ -8,9 +8,11 @@
     "coins" : 100,
     "items" : {
             "Potion" : 1,
-            "Super Potion" : 0,
+            "SuperPotion" : 0,
             "Pokeball" : 6,
             "Greatball" : 1,
             "Ultraball" : 0    
-    }
+        }, 
+    "baseAttack": 50,
+    "baseDefence": 200
 }

@@ -1,5 +1,8 @@
 var assert = require('assert');
+
 module.exports = {
+    
+    //sets player online
     setOnline : function(db, device, callback) {
        db.collection('Players').updateOne(
           { "device" : device },
@@ -9,6 +12,8 @@ module.exports = {
           callback();
        });
     }, 
+    
+    //gets players that are online
     getPlayerStatus: function(db, callback) {
         var foundList = [];
         var cursor = db.collection('Players').find( { "online" : true } ); 

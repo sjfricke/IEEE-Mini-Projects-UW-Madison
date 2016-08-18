@@ -1,13 +1,110 @@
 var net = require('net');
+var _player = require('./palyerList');
+
 module.exports = {
     
     login: function(deviceID) {
-        console.log("debug");
     },
     
+    //updates player
+    //will return player when done
+    updatePlayerList: function(device, bodyKey, bodyValue, postURL) {
+        var currentPlayer -2; //returns if no players updated
+        
+        var confirm = this.confirmPlayerData(postURL, device, bodyKey, bodyValue);    
+        if (confirm == -1) { return -1; }
+        
+        _player.playerList.forEach(function(element){
+
+            if (element.device == device) {
+                element[bodyKey] = bodyValue;   
+                currentPlayer = element;
+            } 
+
+        });
+
+        return currentPlayer;
+    },
+    
+    martOption: function(player, optionValue, callback) {
+        
+        switch(optionValue) {
+            case 1: //pokeball 200
+                if (player.coins < 200) {
+                    callback("Not enough coins, sorry");
+                } else {
+                    
+                    if (this.updatePlayerList(device, "coins", (player.coins - 200), "/updateCoins" || this.updatePlayerList(device, "item.Pokeball", player.item.Pokeball + 1), "/updateItem") == -1) {
+                        callback(-1, "MongoDB on Pi was not able to update");
+                    } else {
+                        callback( "You just bought a Pokeball for 200 coins!" );
+                    } 
+                }           
+                
+               
+                break;
+                
+            case 2: //Greatball 400
+                if (player.coins < 400) {
+                    callback("Not enough coins, sorry");
+                } else {
+                    
+                    if (this.updatePlayerList(device, "coins", (player.coins - 400), "/updateCoins" || this.updatePlayerList(device, "item.Greatball", player.item.Greatball + 1), "/updateItem") == -1) {
+                        callback(-1, "MongoDB on Pi was not able to update");
+                    } else {
+                        callback( "You just bought a Greatball for 400 coins!" );
+                    }
+                } 
+                
+                break;
+                
+            case 3: //Ultraball 750
+                if (player.coins < 750) {
+                    callback("Not enough coins, sorry");
+                } else {
+                    
+                    if (this.updatePlayerList(device, "coins", (player.coins - 750), "/updateCoins" || this.updatePlayerList(device, "item.Ultraball", player.item.Ultraball + 1), "/updateItem") == -1) {
+                        callback(-1, "MongoDB on Pi was not able to update");
+                    } else {
+                        callback( "You just bought a Ultraball for 750 coins!" );
+                    }
+                } 
+                
+                break;
+                
+            case 4: //Potion 200
+                if (player.coins < 200) {
+                    callback("Not enough coins, sorry");
+                } else {
+                    
+                    if (this.updatePlayerList(device, "coins", (player.coins - 200), "/updateCoins" || this.updatePlayerList(device, "item.Potion", player.item.Potion + 1), "/updateItem") == -1) {
+                        callback(-1, "MongoDB on Pi was not able to update");
+                    } else {
+                        callback( "You just bought a Potion for 200 coins!" );
+                    }
+                } 
+                
+                break;
+                
+            case 5: //Super Potion 350
+                if (player.coins < 350) {
+                    callback("Not enough coins, sorry");
+                } else {
+                    
+                    if (this.updatePlayerList(device, "coins", (player.coins - 350), "/updateCoins" || this.updatePlayerList(device, "item.SuperPotion", player.item.SuperPotion + 1), "/updateItem") == -1) {
+                        callback(-1, "MongoDB on Pi was not able to update");
+                    } else {
+                        callback( "You just bought a SuperPotion for 350 coins!" );
+                    }
+                } 
+                
+                break;
+                
+            
+    },
     //returns the array of all the current player data
     //scans for device, will give default otherwise
-    getPlayerData: function(listOfDevices, callback) {
+    scanPlayerData: function(listOfDevices, callback) {
         
         var returnList = [];
         var asyncReturnCount = 0;
@@ -77,26 +174,98 @@ module.exports = {
         return returnVar;
     },
     
-    //used to move player 
-    movePlayer: function () {
-//        switch(direction.toLowerCase()) {
-//            case "up":
-//                playerModel.position.z += 8;
-//                break;
-//            case "left":
-//                playerModel.position.x += 8;
-//                break;
-//            case "right":
-//                playerModel.position.x -= 8;
-//                break;
-//            case "down":
-//                playerModel.position.z -= 8;
-//                break;
-//        }
-//
-//        controls.target = playerModel.position; //sets the aim of the orbit control
+    //returns if valid move in current player state
+    //up = 0, right = 1, down = 2, left = 3
+    // return -1 if in battle
+    // return -2 if will move off grid
+    checkValidMove: function(player, direction){
+        
+        if (player.mode.substring(0,1) == '2') {
+            return -1; //in battle mode
+        }
+        
+        switch(direction) {
+            case 0: //up
+                if (player.z + 8 > 252) {
+                    return -2;
+                } else {
+                    return {"bodyKey" : "z", "bodyValue" : (player.z + 8)}
+                }
+            case 1: //right
+                if (player.x - 8 < -252) {
+                    return -2;
+                } else {
+                    return {"bodyKey" : "x", "bodyValue" : (player.x - 8)}
+                }
+            case 2: //down
+                if (player.z - 8 < -252) {
+                    return -2;
+                } else {
+                    return {"bodyKey" : "z", "bodyValue" : (player.z - 8)}
+                }
+            case 3: //left
+                if (player.x + 8 > 252) {
+                    return -2;
+                } else {
+                    return {"bodyKey" : "x", "bodyValue" : (player.x + 8)}
+                }
+        }
+        
+        return 0; //not a case
+        
     },
     
+    //returns value depending on passed in value
+    //up = 0, right = 1, down = 2, left = 3, invalid = -1
+    //
+    //          0              
+    //      3   x   1
+    //          2
+    //
+    getDirection: function (direction) {
+        switch(direction.toLowerCase()) {
+            case "up":
+                return 0;
+            case "right":
+                return 1;
+            case "down":
+                return 2;
+            case "left":
+                return 3;
+        }
+        
+        return -1; //invalid direction
+    },    
+    
+    confirmPlayerData: function(postCall, device, bodyKey, bodyValue){
+        var client = new net.Socket();
+        client.setTimeout(2000);
+        var raw_request = "POST " + postCall + " HTTP/1.1\n" + "{ " + bodyKey + " : " + bodyValue + " }\0";
+        var responseData = "";
+
+        client.connect(5000, "10.0.0." + device, function() {
+            console.log('Connected');
+            client.write(raw_request);
+        });
+
+        client.on('data', function(data) {
+            console.log('Received: ' + data);
+            responseData += data;
+            client.destroy(); // kill client after server's response
+        });
+
+        client.on('close', function() {
+            console.log('Connection closed');
+            return responseData;
+        });
+        
+        client.on('error', function() {
+            console.log('Connection Failed with ' + device);
+            return -1;
+        });
+        
+        
+    },
     //returns THREE.Vec3 where x and z are random, y is 0
     randomPosition: function () {
 //        var ranX = Math.floor(Math.random() * gridLength); //between 0 and gridlength 
@@ -106,16 +275,6 @@ module.exports = {
 //        ranX = ( (ranX - 32) * 8 ) + 4;
 //        ranZ = ( (ranZ - 32) * 8 ) + 4;
 //        return {"x" : ranX, "z" : ranZ};
-    },
-
-    //returns element id of space (-1 for nothing)
-    checkSpace: function(xPos, zPos, _liveSpaces) {
-//        liveSpaces.forEach(function(element, index, array){
-//            if (xPos == element.x && zPos == element.z && element.live) {
-//                return element.ID;
-//            }
-//        });
-//        return -1;
     }
 };
 

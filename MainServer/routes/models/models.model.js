@@ -6,8 +6,10 @@
 
     var ModelSchema = new Schema({
         Name: String,
+        displayName: String,
         pokemonID: Number,
         health: Number,
+        baseHealth: Number,
         attack: Number,
         defence: Number,
         position: {},
@@ -15,7 +17,9 @@
         rotation: {},
         objFile: String,
         mtlFile: String,
-        value: Number
+        value: Number,
+        live: Boolean,
+        catchFactor: Number
         
     }, 
     { collection : 'Models' }

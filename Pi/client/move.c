@@ -14,11 +14,13 @@
 #include <signal.h>
 
 #define PORT 4000
+#define MAIN_SERVER "10.0.0.186"
 
 int main(int argc , char *argv[])
 {
     if (argc < 2) {
         puts("Need to pass a direction\n");
+        puts("Options: up, down, left, right\n");
         return -1;
     }
 
@@ -33,7 +35,7 @@ int main(int argc , char *argv[])
         printf("Could not create socket");
     }
 
-    server.sin_addr.s_addr = inet_addr("10.0.0.186");
+    server.sin_addr.s_addr = inet_addr(MAIN_SERVER);
     server.sin_family = AF_INET;
     server.sin_port = htons( 8000 );
 

@@ -64,7 +64,7 @@ function init(mode) {
 
     // Grid
     var step = 1 * 8;
-    var size = (gridLength/2) * 8;
+    var size = 32 * 8; //(gridLength/2) so -32 to 32
 
     var geometry = new THREE.Geometry();
 

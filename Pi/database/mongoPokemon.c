@@ -4,10 +4,6 @@
 
 #include "mongoPokemon.h"
 
-#include <bson.h>
-#include <mongoc.h>
-#include <stdio.h>
-
 void newPokemonMongo(void) {
     mongoc_client_t *client;
     mongoc_collection_t *collection;

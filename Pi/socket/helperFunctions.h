@@ -12,4 +12,6 @@
 
 void findRoute(const char* message, char** route);
 
+void findBody(const char* message, char** body);
+
 #endif //PISOCKETS_HELPERFUNCTIONS_H

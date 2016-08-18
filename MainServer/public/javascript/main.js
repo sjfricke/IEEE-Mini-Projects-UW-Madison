@@ -22,9 +22,6 @@ var playerModel;
 var _player = []; //live list of players
 var _liveSpaces = []; //live list of spaces and their items
 
-var gridLength = 64; //size of grid (64 x 64)
-
-
 //animation loop
 function animate() {
 
@@ -72,8 +69,8 @@ function randomPosition() {
     var ranZ = Math.floor(Math.random() * gridLength); //between 0 and gridlength 
     
     // ( (x-(gridLength/2)) * squareSize ) + squareSize/2
-    ranX = ( (ranX - (gridLength/2)) * 8 ) + 4;
-    ranZ = ( (ranZ - (gridLength/2)) * 8 ) + 4;
+    ranX = ( (ranX - 32) * 8 ) + 4;
+    ranZ = ( (ranZ - 32) * 8 ) + 4;
     return new THREE.Vector3(ranX, 0, ranZ);
 }
 

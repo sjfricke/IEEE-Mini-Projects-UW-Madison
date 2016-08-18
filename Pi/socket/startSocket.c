@@ -26,6 +26,7 @@
 int main(int argc, char *argv[])
 {
     char* route = malloc(sizeof(char) * 100);
+    char* postBody = malloc(sizeof(char) * 2000);
     char* returnMsg = malloc(sizeof(char) * 5000);
     char* receiveMsg = malloc(sizeof(char) * 5000); //5000 char max for data
     int msgSize;
@@ -84,7 +85,10 @@ int main(int argc, char *argv[])
             findRoute(receiveMsg, &route);
 
             printf("Route: %s\n", route);
-            post_FindMethod(route, &returnMsg);
+
+            findBody(receiveMsg, &postBody);
+
+            post_FindMethod(route, &returnMsg, postBody);
 
         } else { //something not GET or POST
               printf("NONE \n");

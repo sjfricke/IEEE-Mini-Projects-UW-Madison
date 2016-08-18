@@ -1,5 +1,5 @@
 //
-// Created by SpencerFricke on 8/14/2016.
+// Created by SpencerFricke on 8/10/2016.
 //
 //Use netstat -ant|grep <PORT> | awk '{print$6}'    -to check status of socket if in TIME_WAIT
 
@@ -18,6 +18,12 @@
 
 int main(int argc , char *argv[])
 {
+    if (argc < 2) {
+        puts("Need to pass an option value\n");
+        puts("Options: a, b, c, d, e, f\n");
+        return -1;
+    }
+
     int socket_desc;
     struct sockaddr_in server;
     char message[200], server_reply[2000], *response_body;
@@ -43,8 +49,10 @@ int main(int argc , char *argv[])
     puts("Connected\n");
 
     //Send some data
-    strcpy (message, "GET /login");
+    strcpy (message, "GET /option/");
+    strcat (message, argv[1]);
     strcat (message," HTTP/1.1\r\n\r\n");
+
 
     if( send(socket_desc , message , strlen(message) , 0) < 0)
     {

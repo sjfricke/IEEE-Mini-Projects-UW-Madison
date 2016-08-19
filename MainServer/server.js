@@ -187,6 +187,8 @@ app.get('/move/:direction', function(req, res, next) {
     //fun of checking what they moved too
     model_f.checkSpace(currentPlayer, function(modelResult, err){ 
         //error with model checking
+        console.log("debug");
+        console.log(modelResult);
         if (err) { return res.send("BODY:" + err + "\0"); }
         
         if (modelResult == 1) {
@@ -196,8 +198,21 @@ app.get('/move/:direction', function(req, res, next) {
         
         if (modelResult.pokemonID == 200) {
             //pokeball
-            return res.send("BODY:Pokeball!\0");
-            
+            if (player_f.updatePlayerList(device, "items.Pokeball", currentPlayer.items.Pokeball + 1, "/updateItem") == -1) {
+                return callback(-1, "MongoDB on Pi was not able to update");
+            } else {
+                
+                model_f.setOnlineStatus(modelResult.Name, false, function(statusResult, err){
+                    if (err) { return res.send("BODY:" + err + "\0"); }
+                    
+                    if (statusResult == -1) { return res.send("BODY:ERROR [3.0.1]\0"); }//no Pokeball by Name found 
+                    
+                    return res.send("BODY:Pokeball!\0"); 
+                });   
+                
+                 
+            }        
+                       
         } else if (modelResult.pokemonID == 201) {
             //pokeCenter
             
@@ -219,28 +234,26 @@ app.get('/move/:direction', function(req, res, next) {
             
         } else {
             //pokemon
-            if (!modelResult.live) {
-                return res.send("BODY:Someone already fighting the " + modelResult.displayName + " here\0")
-            } else {
-                //set player mode to battle
-                var battleMode = "2" + modelResult.Name;
+            
+            //set player mode to battle
+            var battleMode = "2" + modelResult.Name;
 
-                if (player_f.updatePlayerList(device, "mode", battleMode, "/updateMode") == -1) {
-                    return res.send("BODY:MongoDB on Pi was not able to update\0");
-                }                
-                            
-                //set pokemon to offline
-                model_f.setOnlineStatus(modelResult.Name, false, function(statusResult, err){
-                    if (err) { return res.send("BODY:" + err + "\0"); }
-                    
-                    if (statusResult == -1) { return res.send("BODY:ERROR [3.0.1]\0"); }//no Pokemon by Name found 
-                    
-                    io.to(passwordList[device].socketID).emit('battle', modelResult); //send update to client
-                    
-                    //FINALLY returning a call back to client, about damn time
-                    return res.send("BODY:A wild has " + modelResult.displayName + " appeared!\0");
-                });                
-            }
+            if (player_f.updatePlayerList(device, "mode", battleMode, "/updateMode") == -1) {
+                return res.send("BODY:MongoDB on Pi was not able to update\0");
+            }                
+
+            //set pokemon to offline
+            model_f.setOnlineStatus(modelResult.Name, false, function(statusResult, err){
+                if (err) { return res.send("BODY:" + err + "\0"); }
+
+                if (statusResult == -1) { return res.send("BODY:ERROR [3.0.1]\0"); }//no Pokemon by Name found 
+
+                io.to(passwordList[device].socketID).emit('battle', modelResult); //send update to client
+
+                //FINALLY returning a call back to client, about damn time
+                return res.send("BODY:A wild has " + modelResult.displayName + " appeared!\0");
+            });                
+            
         }
         
         

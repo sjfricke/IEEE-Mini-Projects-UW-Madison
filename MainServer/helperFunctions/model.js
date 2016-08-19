@@ -3,20 +3,21 @@ var _liveSpaces = require('./pokemonList');
 
 module.exports = {
     checkSpace : function(player, callback){ 
-        ModelSchema.find({"position.x" : player.x, "position.z" : player.z}, function (err, post) {
+        
+        ModelSchema.find({"position.x" : player.x, "position.z" : player.z, "live" : true}, function (err, post) {
 
             if (err) {
                 console.error(err);
-                callback(false, err);
+                return callback(false, err);
             }
 
             if (post.length > 1) {
                 console.log("~~~~~~~~~~~~\ncheckSpace: Two or more models found at this space\n~~~~~~~~~~~~\n");
-                callback(post[0]);
-            } else if (post.length < 0) {
-                callback(1); //nothing found
+                return callback(post[0]);
+            } else if (post.length == 0) {
+                return callback(1); //nothing found
             } else {
-                callback(post[0]); //return the only one found
+                return callback(post[0]); //return the only one found
             }
 
         });
@@ -26,22 +27,15 @@ module.exports = {
         
         ModelSchema.findOneAndUpdate({"Name" : pokemonName}, {
                 $set: {
-                    "online": status
+                    "live": status
                 }
             },function (err, post) {
 
                 if (err) {
                     console.error(err);
-                    callback(false, err);
-                }
-
-                if (post.length > 1) {
-                    console.log("~~~~~~~~~~~~\nsetOnlineStatus: Two or more models found at this space\n~~~~~~~~~~~~\n");
-                    callback(post[0]);
-                } else if (post.length < 0) {
-                    callback(-1); //nothing found
+                    return callback(false, err);
                 } else {
-                    callback(post[0]); //return the only one found
+                    return callback(post._doc); //findOneAndUpdate sends an object, not array
                 }
 
         });
@@ -54,19 +48,12 @@ module.exports = {
                     "health": health
                 }
             },function (err, post) {
-
+            
                 if (err) {
                     console.error(err);
-                    callback(false, err);
-                }
-
-                if (post.length > 1) {
-                    console.log("~~~~~~~~~~~~\nsetOnlineStatus: Two or more models found at this space\n~~~~~~~~~~~~\n");
-                    callback(post[0]);
-                } else if (post.length < 0) {
-                    callback(-1); //nothing found
+                    return callback(false, err);
                 } else {
-                    callback(post[0]); //return the only one found
+                    return callback(post._doc); //findOneAndUpdate sends an object, not array
                 }
 
         });

@@ -9,7 +9,7 @@ module.exports = {
           {
             $set: { "online": true }
           }, function(err, results) {
-          callback();
+          return callback();
        });
     }, 
     
@@ -24,7 +24,7 @@ module.exports = {
           if (doc != null) {
              foundList.push(doc.device);
           } else {
-             callback(foundList);
+             return callback(foundList);
           }
        });
     }

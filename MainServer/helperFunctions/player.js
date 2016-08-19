@@ -1,5 +1,5 @@
 var net = require('net');
-var _player = require('./palyerList');
+var _player = require('./playerList');
 
 module.exports = {
     
@@ -9,20 +9,21 @@ module.exports = {
     //updates player
     //will return player when done
     updatePlayerList: function(device, bodyKey, bodyValue, postURL) {
-        var currentPlayer -2; //returns if no players updated
+        var currentPlayer = -2; //returns if no players updated
         
         var confirm = this.confirmPlayerData(postURL, device, bodyKey, bodyValue);    
         if (confirm == -1) { return -1; }
         
-        _player.playerList.forEach(function(element){
+        _player.playerList.forEach(function(element, index){
 
             if (element.device == device) {
-                element[bodyKey] = bodyValue;   
-                currentPlayer = element;
+                //because the bodyKey might be two deep in json, we need to eval it
+                eval("element." + bodyKey + " = bodyValue");   
+                currentPlayer = element;                
+                console.log("updated " + bodyKey + " locally");
             } 
 
         });
-
         return currentPlayer;
     },
     
@@ -31,13 +32,15 @@ module.exports = {
         switch(optionValue) {
             case 1: //pokeball 200
                 if (player.coins < 200) {
-                    callback("Not enough coins, sorry");
+                    return callback("Not enough coins, sorry");
                 } else {
                     
-                    if (this.updatePlayerList(device, "coins", (player.coins - 200), "/updateCoins" || this.updatePlayerList(device, "item.Pokeball", player.item.Pokeball + 1), "/updateItem") == -1) {
-                        callback(-1, "MongoDB on Pi was not able to update");
+                    if (this.updatePlayerList(player.device, "coins", (player.coins - 200), "/updateCoins") == -1 ||
+                        this.updatePlayerList(player.device, "items.Pokeball", player.items.Pokeball + 1, "/updateItem") == -1
+                        ) {
+                        return callback(-1, "MongoDB on Pi was not able to update");
                     } else {
-                        callback( "You just bought a Pokeball for 200 coins!" );
+                        return callback( "You just bought a Pokeball for 200 coins!" );
                     } 
                 }           
                 
@@ -46,13 +49,15 @@ module.exports = {
                 
             case 2: //Greatball 400
                 if (player.coins < 400) {
-                    callback("Not enough coins, sorry");
+                    return callback("Not enough coins, sorry");
                 } else {
                     
-                    if (this.updatePlayerList(device, "coins", (player.coins - 400), "/updateCoins" || this.updatePlayerList(device, "item.Greatball", player.item.Greatball + 1), "/updateItem") == -1) {
-                        callback(-1, "MongoDB on Pi was not able to update");
+                    if (this.updatePlayerList(player.device, "coins", (player.coins - 400), "/updateCoins") == -1 ||
+                        this.updatePlayerList(player.device, "items.Greatball", player.items.Greatball + 1, "/updateItem") == -1
+                        ) {                    
+                        return callback(-1, "MongoDB on Pi was not able to update");
                     } else {
-                        callback( "You just bought a Greatball for 400 coins!" );
+                        return callback( "You just bought a Greatball for 400 coins!" );
                     }
                 } 
                 
@@ -60,13 +65,15 @@ module.exports = {
                 
             case 3: //Ultraball 750
                 if (player.coins < 750) {
-                    callback("Not enough coins, sorry");
+                    return callback("Not enough coins, sorry");
                 } else {
                     
-                    if (this.updatePlayerList(device, "coins", (player.coins - 750), "/updateCoins" || this.updatePlayerList(device, "item.Ultraball", player.item.Ultraball + 1), "/updateItem") == -1) {
-                        callback(-1, "MongoDB on Pi was not able to update");
+                    if (this.updatePlayerList(player.device, "coins", (player.coins - 750), "/updateCoins") == -1 ||
+                        this.updatePlayerList(player.device, "items.Ultraball", player.items.Ultraball + 1, "/updateItem") == -1
+                        ) {
+                        return callback(-1, "MongoDB on Pi was not able to update");
                     } else {
-                        callback( "You just bought a Ultraball for 750 coins!" );
+                        return callback( "You just bought a Ultraball for 750 coins!" );
                     }
                 } 
                 
@@ -74,13 +81,15 @@ module.exports = {
                 
             case 4: //Potion 200
                 if (player.coins < 200) {
-                    callback("Not enough coins, sorry");
+                    return callback("Not enough coins, sorry");
                 } else {
                     
-                    if (this.updatePlayerList(device, "coins", (player.coins - 200), "/updateCoins" || this.updatePlayerList(device, "item.Potion", player.item.Potion + 1), "/updateItem") == -1) {
-                        callback(-1, "MongoDB on Pi was not able to update");
+                    if (this.updatePlayerList(player.device, "coins", (player.coins - 200), "/updateCoins") == -1 ||
+                        this.updatePlayerList(player.device, "items.Potion", player.items.Potion + 1, "/updateItem") == -1
+                        ) {
+                        return callback(-1, "MongoDB on Pi was not able to update");
                     } else {
-                        callback( "You just bought a Potion for 200 coins!" );
+                        return callback( "You just bought a Potion for 200 coins!" );
                     }
                 } 
                 
@@ -88,17 +97,20 @@ module.exports = {
                 
             case 5: //Super Potion 350
                 if (player.coins < 350) {
-                    callback("Not enough coins, sorry");
+                    return callback("Not enough coins, sorry");
                 } else {
                     
-                    if (this.updatePlayerList(device, "coins", (player.coins - 350), "/updateCoins" || this.updatePlayerList(device, "item.SuperPotion", player.item.SuperPotion + 1), "/updateItem") == -1) {
-                        callback(-1, "MongoDB on Pi was not able to update");
+                    if (this.updatePlayerList(player.device, "coins", (player.coins - 350), "/updateCoins") == -1 ||
+                        this.updatePlayerList(player.device, "items.SuperPotion", player.items.SuperPotion + 1, "/updateItem") == -1
+                        ) {
+                        return callback(-1, "MongoDB on Pi was not able to update");
                     } else {
-                        callback( "You just bought a SuperPotion for 350 coins!" );
+                        return callback( "You just bought a SuperPotion for 350 coins!" );
                     }
                 } 
                 
                 break;
+        }   
                 
             
     },
@@ -240,6 +252,7 @@ module.exports = {
     confirmPlayerData: function(postCall, device, bodyKey, bodyValue){
         var client = new net.Socket();
         client.setTimeout(2000);
+        
         var raw_request = "POST " + postCall + " HTTP/1.1\n" + "{ " + bodyKey + " : " + bodyValue + " }\0";
         var responseData = "";
 

@@ -14,7 +14,17 @@
         });
     };
     
-        
+    //gets one by name
+    module.exports.getOne = function(req, res) { 
+        Model.findOne({ "Name" : req.params.name }, function (err, post) {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(err);
+            }
+            res.json(post);
+        });
+    };    
+    
     
     
     

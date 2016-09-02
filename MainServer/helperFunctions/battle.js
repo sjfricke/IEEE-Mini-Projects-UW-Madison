@@ -1,6 +1,7 @@
 var _liveSpaces = require('./pokemonList');
 var model_f = require('./model');
 var player_f = require('./player');
+var io = require('../sockets').get_io();
 
 var battleExport = module.exports = {
 

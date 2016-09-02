@@ -14,7 +14,7 @@
 #include <signal.h>
 
 #define PORT 4000
-#define MAIN_SERVER "10.0.0.186"
+#define MAIN_SERVER "10.0.0.8"
 
 int main(int argc , char *argv[])
 {

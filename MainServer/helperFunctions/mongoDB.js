@@ -1,5 +1,6 @@
 var assert = require('assert');
 
+
 module.exports = {
     
     //sets player online
@@ -11,7 +12,7 @@ module.exports = {
           }, function(err, results) {
           return callback();
        });
-    }, 
+    },
     
     //gets players that are online
     getPlayerStatus: function(db, callback) {

@@ -1,5 +1,6 @@
 var ModelSchema = require('.././routes/models/models.model');
 var _liveSpaces = require('./pokemonList');
+var io = require('../sockets').get_io();
 
 module.exports = {
     checkSpace : function(player, callback){ 

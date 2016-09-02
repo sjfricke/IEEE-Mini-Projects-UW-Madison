@@ -1,5 +1,6 @@
 var net = require('net');
 var _player = require('./playerList');
+var io = require('../sockets').get_io();
 
 module.exports = {
     

@@ -24,16 +24,15 @@
 <body>
 </body>
     
+
 <script src="/javascript/main.js"></script>
-<script src="/javascript/map.js"></script>
+<script src="/javascript/sockets.js"></script>
+<script src="/javascript/map_scene.js"></script>
+<script src="/javascript/battle_scene.js"></script>
 <script>
 //inital call to set everything in motion
 //called after everything is initalized
-//will be called once database is updated with the device's info
-socket.on('initalize', function(data){    
-    init(data); 
-    animate();
-});    
+    initModel();    
 </script>
 
 </html>

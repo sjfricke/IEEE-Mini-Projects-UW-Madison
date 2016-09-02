@@ -9,7 +9,7 @@ var cookieParser = require('cookie-parser'); //Parse Cookie header and populate 
 var bodyParser = require('body-parser'); //allows the use of req.body in POST request
 var server = require('http').createServer(app); //creates an HTTP server instance
 var http = require('http'); //Node.js module creates an instance of HTTP to make calls to Pi
-var io = require('socket.io')(server); //allows for sockets on the HTTP server instance
+var io = require('./sockets').listen(server) //allows for sockets on the HTTP server instance
 var extend = require('util')._extend; //used to make copy of objects -> extend({}, objToCopy);
 
 //-------------------------Globals-----------------------------//
@@ -18,10 +18,6 @@ var _liveSpaces = require("./helperFunctions/pokemonList"); //live list of space
 
 var localIP = require("ip").address(); //used to know where to check for web view site
 console.log("Local IP: " + localIP);
-
-//gets generated password list
-var passLength = 4;//Assume passwords are 4 char long
-var passwordList = require('./passwordList');
 
 var defaultPlayer = require('./setup/defaultPlayer'); //used as template for first time login
 //-------------------------getting funtions/routes from other files-----------------------------//
@@ -141,7 +137,7 @@ app.get('/login', function(req, res, next) {
 app.get('/getLink', function(req, res, next) {
     var device = parseInt( req.ip.split(/[.]+/).pop() );
     console.log("Getting Link for Device: " + device);
-    return res.send("BODY:Open Browser to: " + localIP + ":"+ server.address().port + "/play/" + device + passwordList[device].password+"\n");
+    return res.send("BODY:Open Browser to: " + localIP + ":"+ server.address().port + "/play/" + device + "\n");
 });
 
 //takes care of moving
@@ -181,9 +177,7 @@ app.get('/move/:direction', function(req, res, next) {
     //updates local copy
     var currentPlayer = player_f.updatePlayerList(device, validMove.bodyKey, validMove.bodyValue, "/movePlayer");    
     if (currentPlayer == -1) { return res.send("BODY:MongoDB on Pi was not able to update\0"); }               
-    
-    io.to(passwordList[device].socketID).emit('movePlayer', currentPlayer); //send update to client
-    
+        
     //fun of checking what they moved too
     model_f.checkSpace(currentPlayer, function(modelResult, err){ 
         //error with model checking
@@ -248,8 +242,6 @@ app.get('/move/:direction', function(req, res, next) {
 
                 if (statusResult == -1) { return res.send("BODY:ERROR [3.0.1]\0"); }//no Pokemon by Name found 
 
-                io.to(passwordList[device].socketID).emit('battle', modelResult); //send update to client
-
                 //FINALLY returning a call back to client, about damn time
                 return res.send("BODY:A wild has " + modelResult.displayName + " appeared!\0");
             });                
@@ -262,19 +254,12 @@ app.get('/move/:direction', function(req, res, next) {
    
 }); //end of get('/move')
 
-//device from 10.0.0.200 and a pass of 3465 should be:
-// /play/2003465
-app.get('/play/:id', function(req, res, next) {
-    if (passwordList[req.params.id.substr(0,req.params.id.length - passLength)].password != req.params.id.substr(req.params.id.length - passLength)) {
-        //checks if password matches ID of device
-        //TODO: not make such a bloated IF statement
-        return res.send("Incorrect Link");
-    } else {
-        
-        return res.render('index', {
-            device: req.params.id.substr(0,req.params.id.length - passLength)
-        });        
-    } 
+//device from 10.0.0.200 should be:
+// /play/200
+app.get('/play/:id', function(req, res, next) {    
+    res.render('index', {
+        device: req.params.id
+    });   
 });
 
 //used to pick from various options
@@ -320,24 +305,17 @@ app.get('/option/:value', function(req, res, next) {
     }
 });
 
+app.get('/getPlayers', function(req, res, next) {
+    res.json(_player.playerList);
+});
 
+
+app.get('/test', function(req, res, next) {
+    mongoDB_f.test();
+    res.send("done");
+});
 //-------------------------Sockets-----------------------------//
-io.on('connection', function(client) {       
-    
-    console.log("connecting" + client.id);
 
-    //used right after socket connects for client to send its device ID
-    //ID is set in passwordList
-    client.on('setSocketID', function(data) {
-        passwordList[data].socketID = client.id;                
-    });
-    
-    //on disconnect of application
-    client.on('disconnect', function() { 
-        console.log("disconnect" + client.id);         
-    });
-    
-}); //io.on end
 
 
 

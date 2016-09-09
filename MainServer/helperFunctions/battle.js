@@ -27,6 +27,8 @@ var battleExport = module.exports = {
                            ) {
                             return callback(-1, "MongoDB on Pi was not able to update");
                         } else {
+                            //updates mode to all web viewers
+                            io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
                             return callback( "You killed " + pokemon.displayName + " and got " + Math.floor(pokemon.value * .25) + " coins" );
                         }
 
@@ -44,6 +46,8 @@ var battleExport = module.exports = {
                                    ) {
                                     return callback(-1, "MongoDB on Pi was not able to update");
                                 } else {
+                                    //updates mode to all web viewers
+                                    io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
                                     return callback("You passed out, when you woke up, " + pokemon.displayName + " got away");
                                 }
 
@@ -74,6 +78,8 @@ var battleExport = module.exports = {
                            ) {
                             return callback(-1, "MongoDB on Pi was not able to update");
                         } else {
+                            //updates mode to all web viewers
+                            io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
                             return callback( "You killed " + pokemon.displayName + " and got " + Math.floor(pokemon.value * .25) + " coins" );
                         }
 
@@ -90,6 +96,8 @@ var battleExport = module.exports = {
                                     player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1) {
                                     return callback(-1, "MongoDB on Pi was not able to update");
                                 } else {
+                                    //updates mode to all web viewers
+                                    io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
                                     return callback("You passed out, when you woke up, " + pokemon.displayName + " got away");
                                 }
 
@@ -110,6 +118,9 @@ var battleExport = module.exports = {
                 if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1) {
                     return callback(-1, "MongoDB on Pi was not able to update");
                 } else {
+                    
+                    //updates mode to all web viewers
+                    io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
                     
                     model_f.setOnlineStatus(pokemon.Name, true, function(result, err){                        
                         if (err) { return callback(-1, "MongoDB on server was not able to update"); }
@@ -133,6 +144,8 @@ var battleExport = module.exports = {
                        ) {
                         return callback(-1, "MongoDB on Pi was not able to update");
                     } else {
+                        //updates mode to all web viewers
+                        io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
                         return callback( "You caught " + pokemon.displayName + " and got " + (pokemon.value) + " coins!" );
                     }
                     
@@ -161,6 +174,8 @@ var battleExport = module.exports = {
                        ) {
                         return callback(-1, "MongoDB on Pi was not able to update");
                     } else {
+                        //updates mode to all web viewers
+                        io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
                         return callback( "You caught " + pokemon.displayName + " and got " + (pokemon.value) + " coins!" );
                     }
                     
@@ -186,6 +201,8 @@ var battleExport = module.exports = {
                        ) {
                         return callback(-1, "MongoDB on Pi was not able to update");
                     } else {
+                        //updates mode to all web viewers
+                        io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
                         return callback( "You caught " + pokemon.displayName + " and got " + (pokemon.value) + " coins!" );
                     }
                     

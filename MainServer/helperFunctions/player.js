@@ -250,6 +250,7 @@ module.exports = {
         return -1; //invalid direction
     },    
     
+    //sends back data to Pi and will be able to validate the pi has been updated
     confirmPlayerData: function(postCall, device, bodyKey, bodyValue){
         var client = new net.Socket();
         client.setTimeout(2000);

@@ -14,21 +14,50 @@
 <script src="/lib/three.min.js"></script>
 <script src="/lib/ThreeJs_Extra/controls/OrbitControls.js"></script>
 <script src="/lib/ThreeJs_Extra/controls/MouseControls.js"></script>
-<script src="/lib/ThreeJs_Extra/loaders/ColladaLoader.js"></script>
 <script src="/lib/ThreeJs_Extra/loaders/MTLLoader.js"></script>
 <script src="/lib/ThreeJs_Extra/loaders/OBJLoader.js"></script>
-<script src="/lib/ThreeJs_Extra/loaders/FBXLoader.js"></script>
     
 <script> var deviceID = "<%= device %>"; console.log("Device ID: " + deviceID); </script>
 </head>
 <body>
+    <canvas id="healthBar" style="z-index: 3; position: absolute; left:0px; top:0px; visibility: hidden;"></canvas>
+    <div id="battleOptions" style="z-index: 3; position: absolute; right:100px; bottom:50px; visibility: hidden;">
+        1 - Light Attack<br>
+        2 - Big Attack<br>
+        3 - Pokeball <br>
+        4 - GreatBall <br>
+        5 - UltraBall <br>
+        6 - Potion <br>
+        7 - Super Potion
+    </div>
+    <div id="storeOptions" style="z-index: 3; position: absolute; right:100px; top:50px; background-color: rgba(255,255,255,0.5); visibility: hidden;">
+        1 - Pokeball - 200 coins <br>
+        2 - Greatball - 400 coins <br>
+        3 - Ultraball - 700 coins <br>
+        4 - Potion - 200 coins <br>
+        5 - Super Potion - 350 coins <br>
+    </div>
+    <div id="mainCanvas" style="z-index: 1; position: absolute; left:0px; top:0px;"></div>
+    <div id="stats" style="z-index: 3; position: absolute; left:5px; top:5px; background-color: rgba(255,255,255,0.8); visibility: hidden;">        
+        <b>Score:</b> <span id="stat_score"></span><br>
+        <b>Coins:</b> <span id="stat_coins"></span><br>
+        <br>        
+        <b>Base Attack:</b> <span id="stat_baseAttack"></span><br>
+        <b>Health:</b> <span id="stat_health"></span><br>
+        <br>
+        <b>PokeBalls:</b> <span id="stat_Pokeball"></span><br>
+        <b>GreatBalls:</b> <span id="stat_Greatball"></span><br>
+        <b>UltraBalls:</b> <span id="stat_Ultraball"></span><br>
+        <b>Potions:</b> <span id="stat_Potion"></span><br>
+        <b>Super Potions:</b> <span id="stat_SuperPotion"></span><br>
+    </div>
 </body>
     
-
 <script src="/javascript/main.js"></script>
 <script src="/javascript/sockets.js"></script>
 <script src="/javascript/map_scene.js"></script>
 <script src="/javascript/battle_scene.js"></script>
+<script src="/javascript/HUD_Canvas.js"></script>
 <script>
 //inital call to set everything in motion
 //called after everything is initalized

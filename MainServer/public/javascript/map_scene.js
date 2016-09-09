@@ -96,7 +96,7 @@ function init_map() {
       "Greatball": 20,
       "Ultraball": 20
     },
-    "mode": "2Alakazam",
+    "mode": "2Charizard",
     "online": false,
     "score": 3559,
     "x": -4,
@@ -109,18 +109,39 @@ function init_map() {
     "baseAttack": "50",
     "coins": 9,
     "device": 4,
-    "health": 100,
+    "health": 10,
     "items": {
       "Potion": 20,
       "SuperPotion": 2,
       "Pokeball": 18,
-      "Greatball": 20,
+      "Greatball": 10,
       "Ultraball": 20
     },
     "mode": "0",
     "online": false,
     "score": 3559,
     "x": -20,
+    "z": 52
+  },
+    {
+    "_id": {
+      "$oid": "57b139404c69c7b65351adb0"
+    },
+    "baseAttack": "50",
+    "coins": 9,
+    "device": 255,
+    "health": 100,
+    "items": {
+      "Potion": 20,
+      "SuperPotion": 2,
+      "Pokeball": 18,
+      "Greatball": 20,
+      "Ultraball": 21
+    },
+    "mode": "1",
+    "online": false,
+    "score": 3559,
+    "x": 20,
     "z": 52
   }
 ]
@@ -143,12 +164,26 @@ function init_map() {
         
         //gets mode of this player
         if (element.device == deviceID) {
-            if (element.mode.substring(0,1) == '2') {
+            
+            playerStats = element; //gathers player's inital stats
+            updateStats(playerStats); //updates the canvas text
+            
+            var thisPlayerModeKey = element.mode.substring(0,1);
+            if (thisPlayerModeKey == '2') { //battle
                 sceneMode = 2;
                 loadPokemon(element.mode.substring(1));
-            } else {
+                setHUDLayout(1);
+                
+            } else if (thisPlayerModeKey == '1') { //store
+                sceneMode = 1;            
+                setHUDLayout(2); //store HUD
+                
+            } else if (thisPlayerModeKey == '0') { //normal
                 sceneMode = 1;
+                setHUDLayout(0); //clears HUD
             }
+            
+            
         }
         
     });
@@ -157,4 +192,17 @@ function init_map() {
     controls_map.target = playerModel.position; //sets control to focus on it   
     
     
+}
+
+//used to move player 
+function movePlayer(xVal, zVal, objectName) {
+    
+    var modelMoving = scene_map.getObjectByName(objectName);
+    
+    modelMoving.position.z = xVal;
+    modelMoving.position.x = zVal;     
+    
+    if (modelMoving == playerModel) {
+        controls_map.target = playerModel.position; //sets the aim of the orbit control for user player model
+    }
 }

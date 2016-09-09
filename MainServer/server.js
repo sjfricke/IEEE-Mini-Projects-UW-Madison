@@ -172,11 +172,15 @@ app.get('/move/:direction', function(req, res, next) {
         if (player_f.updatePlayerList(device, "mode", "0", "/updateMode") == -1) {
             return res.send("BODY:MongoDB on Pi was not able to update\0");
         }                
+        //updates mode to all web viewers
+        io.emit('modeUpdate', {"mode" : "0", "device" : device}); 
     }
     
     //updates local copy
     var currentPlayer = player_f.updatePlayerList(device, validMove.bodyKey, validMove.bodyValue, "/movePlayer");    
-    if (currentPlayer == -1) { return res.send("BODY:MongoDB on Pi was not able to update\0"); }               
+    if (currentPlayer == -1) { return res.send("BODY:MongoDB on Pi was not able to update\0"); }    
+    //updates player positions to all web viewers
+    io.emit('movePlayer', {"x" : currentPlayer.x, "z" : currentPlayer.z, "device" : device}); 
         
     //fun of checking what they moved too
     model_f.checkSpace(currentPlayer, function(modelResult, err){ 
@@ -196,11 +200,14 @@ app.get('/move/:direction', function(req, res, next) {
                 return callback(-1, "MongoDB on Pi was not able to update");
             } else {
                 
+                io.emit('playerUpdate', {"player" : currentPlayer, "device" : device}); 
+                
+                //sets model to offline after found
                 model_f.setOnlineStatus(modelResult.Name, false, function(statusResult, err){
                     if (err) { return res.send("BODY:" + err + "\0"); }
                     
                     if (statusResult == -1) { return res.send("BODY:ERROR [3.0.1]\0"); }//no Pokeball by Name found 
-                    
+                                        
                     return res.send("BODY:Pokeball!\0"); 
                 });   
                 
@@ -214,6 +221,8 @@ app.get('/move/:direction', function(req, res, next) {
                 return res.send("BODY:MongoDB on Pi was not able to update\0");
             }                
             
+            io.emit('playerUpdate', {"player" : currentPlayer, "device" : device}); 
+            
             return res.send("BODY:You have been given full health!\0");
             
         } else if (modelResult.pokemonID == 202) {
@@ -223,6 +232,8 @@ app.get('/move/:direction', function(req, res, next) {
             if (player_f.updatePlayerList(device, "mode", "1", "/updateMode") == -1) {
                 return res.send("BODY:MongoDB on Pi was not able to update\0");
             }                
+            //updates mode to all web viewers
+            io.emit('modeUpdate', {"mode" : "1", "device" : device}); 
             
             return res.send("BODY:Want to buy an item?\0");
             
@@ -235,6 +246,8 @@ app.get('/move/:direction', function(req, res, next) {
             if (player_f.updatePlayerList(device, "mode", battleMode, "/updateMode") == -1) {
                 return res.send("BODY:MongoDB on Pi was not able to update\0");
             }                
+            //updates mode to all web viewers
+            io.emit('modeUpdate', {"mode" : battleMode, "device" : device}); 
 
             //set pokemon to offline
             model_f.setOnlineStatus(modelResult.Name, false, function(statusResult, err){
@@ -287,6 +300,9 @@ app.get('/option/:value', function(req, res, next) {
         player_f.martOption(player, optionValue, function(optionResult, err){
             if (err) { return res.send("BODY:" + err + "\0"); }
             
+            //updates stats to all web viewers
+            io.emit('playerUpdate', {"player" : player, "device" : device}); 
+            
             return res.send("BODY:" + optionResult + "\0");
             
         });
@@ -295,6 +311,9 @@ app.get('/option/:value', function(req, res, next) {
         //Battle
         battle_f.option(player, optionValue, function(optionResult, err){
             if (err) { return res.send("BODY:" + err + "\0"); }
+                
+            //updates stats to all web viewers
+            io.emit('playerUpdate', {"player" : player, "device" : device}); 
             
             return res.send("BODY:" + optionResult + "\0");
             
@@ -311,8 +330,9 @@ app.get('/getPlayers', function(req, res, next) {
 
 
 app.get('/test', function(req, res, next) {
-    mongoDB_f.test();
-    res.send("done");
+//    mongoDB_f.test();
+//    res.send("done");
+//        player_f.test();
 });
 //-------------------------Sockets-----------------------------//
 

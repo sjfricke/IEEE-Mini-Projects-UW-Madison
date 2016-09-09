@@ -20,28 +20,51 @@ function init_battle() {
     var playerObject = loadList[0].clone(); //0 is the id for player model
         
     playerObject.name = "player" + deviceID;
-    playerObject.position.set(4, -4, 0);
+    playerObject.position.set(3, -4, 0);
     playerObject.scale.set(.5, .5, .5);
     playerObject.rotation.set(0, -.3, 0);
     scene_battle.add( playerObject );
     
     playerModelBattle = scene_battle.getObjectByName("player" + deviceID); //gives name to find
 
-    
-    
-    
+//    var hudCanvas = document.createElement('canvas');
+//    hudCanvas.width = window.innerWidth;
+//    hudCanvas.height = window.innerHeight;
+//    var hudBitmap = hudCanvas.getContext('2d');
+//    hudBitmap.font = "Normal 40px Arial";
+//    hudBitmap.textAlign = 'center';
+//    hudBitmap.fillStyle = "rgba(245,245,245,0.75)";
+//    hudBitmap.fillText('Initializing...', window.innerWidth / 2, window.innerHeight / 2);
+//    var cameraHUD = new THREE.OrthographicCamera(
+//        -window.innerWidth/2, window.innerWidth/2,
+//        window.innerHeight/2, -window.innerHeight/2,
+//        0, 30
+//    );
+//    var hudTexture = new THREE.Texture(hudCanvas)
+//    hudTexture.needsUpdate = true;
+//    var material = new THREE.MeshBasicMaterial( {map: hudTexture } );
+//    material.transparent = true;
+//
+//    var planeGeometry = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
+//    var plane = new THREE.Mesh( planeGeometry, material );
+//    scene_battle.add( plane );
     
 }
 
 //gets pokemon fighting loaded
 function loadPokemon(pokemonName) {
     
+    //removes pokemon if already there
+    if (pokemonModelBattle != null) {
+        scene_battle.remove(pokemonModelBattle);
+    }
+    
     $.get("/api/models/one/" + pokemonName, function(result){        
         
         var pokemonObject = loadList[result.pokemonID].clone(); //gets model data
         
         pokemonObject.name = result.Name;
-        pokemonObject.position.set(-8, -2.5, 8);
+        pokemonObject.position.set(-6, -2.5, 8);
         pokemonObject.scale.set(result.scale.x, result.scale.y, result.scale.z);
         pokemonObject.rotation.set(result.rotation.x, result.rotation.y - 3.9, result.rotation.z);
         

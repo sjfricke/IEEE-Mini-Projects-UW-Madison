@@ -4,7 +4,7 @@
 var container, stats;
 var scene, renderer;
 var lookAtScene = true;
-var playerModel, playerModelBattle, pokemonModelBattle;
+var playerModel, playerModelBattle, pokemonModelBattle, playerStats;
 var skyboxMesh; 
 
 //1 = map
@@ -43,27 +43,6 @@ function render() {
         renderer.render( scene_battle, camera_battle );
     }
 
-}
-
-//used to move player 
-function movePlayer(direction) {
-    
-    switch(direction.toLowerCase()) {
-        case "up":
-            playerModel.position.z += 8;
-            break;
-        case "left":
-            playerModel.position.x += 8;
-            break;
-        case "right":
-            playerModel.position.x -= 8;
-            break;
-        case "down":
-            playerModel.position.z -= 8;
-            break;
-    }
-    
-    controls_map.target = playerModel.position; //sets the aim of the orbit control
 }
 
 //returns THREE.Vec3 where x and z are random, y is 0
@@ -134,7 +113,8 @@ function initModel() {
 function init(){  
         
     //makes full screen the scene
-    container = document.createElement('div');
+    container = document.getElementById('mainCanvas');
+//    container = document.createElement('div');
     document.body.appendChild( container );
     
     //sets the WebGL render - both scenes use it
@@ -203,12 +183,22 @@ function loadModel(p_id, p_objFile, p_mtlFile, callback){
 } //loadModel
 
 window.addEventListener('keydown', function(e){
-    if (e.keyCode == 88) {
-        if (sceneMode == 1){
-            sceneMode = 2;
-        } else {
-            sceneMode = 1;
-        }
+    if (e.keyCode == 88) { //x
+        
+      setHUDLayout(3); //toggles stats screen
+//        if (sceneMode == 1){
+//            sceneMode = 2;
+//        } else {
+//            sceneMode = 1;
+//        }
+    }
+    
+    if (e.keyCode == 90) { //z
+        playerStats.coins += 10;
+    }
+    
+    if (e.keyCode == 67) { //c
+        updateStats(playerStats);
     }
 });
 
@@ -271,3 +261,5 @@ function roundRect(ctx, x, y, w, h, r) {
     ctx.fill();
 	ctx.stroke();   
 }
+
+

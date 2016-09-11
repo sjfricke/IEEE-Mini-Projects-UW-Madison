@@ -3,6 +3,8 @@ var _liveSpaces = require('./pokemonList');
 var io = require('../sockets').get_io();
 
 module.exports = {
+    
+    //function used to check model collection for a live pokemone
     checkSpace : function(player, callback){ 
         
         ModelSchema.find({"position.x" : player.x, "position.z" : player.z, "live" : true}, function (err, post) {
@@ -24,6 +26,7 @@ module.exports = {
         });
     }, 
     
+    //Allows to set the live status of any model
     setOnlineStatus : function(pokemonName, status, callback) {
         
         ModelSchema.findOneAndUpdate({"Name" : pokemonName}, {
@@ -42,6 +45,7 @@ module.exports = {
         });
     }, 
     
+    //Sets the health of pokemon
     setHealth : function(pokemonName, health, callback) {
         
         ModelSchema.findOneAndUpdate({"Name" : pokemonName}, {

@@ -76,7 +76,12 @@ function init_map() {
         modelMesh.rotation.set(element.rotation.x, element.rotation.y, element.rotation.z);
 
         modelMesh.name = element.Name;
-
+        
+        //hides models that are not live
+        if (!element.live) {
+            modelMesh.visible = false;
+        }
+ 
         scene_map.add( modelMesh );
         
     });
@@ -157,13 +162,16 @@ function init_map() {
         scene_map.add( object );
         
         //adds name above player
-        //space hack due to THREE.js r64 change to spirit alignment       
+        //space hack due to THREE.js r64 change to sprite alignment       
         var spritey = makeTextSprite( "                       Player " + element.device );
         spritey.position.set(element.x, 6,element.z );
         scene_map.add( spritey );
         
         //gets mode of this player
         if (element.device == deviceID) {
+            
+            //this will allow us to move the sprite name with the player
+            spritey.name = "playerSprite"; 
             
             playerStats = element; //gathers player's inital stats
             updateStats(playerStats); //updates the canvas text

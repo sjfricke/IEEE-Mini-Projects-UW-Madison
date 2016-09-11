@@ -4,7 +4,9 @@
 var container, stats;
 var scene, renderer;
 var lookAtScene = true;
-var playerModel, playerModelBattle, pokemonModelBattle, playerStats;
+var playerModel;  
+var playerModelBattle, pokemonModelBattle;
+var playerStats;
 var skyboxMesh; 
 
 //1 = map
@@ -141,20 +143,20 @@ function init(){
 }
 
 //used for resizing of window to handle it
-//window.addEventListener( 'resize', onWindowResize, false );
-//function onWindowResize(){
-//
-//    if (sceneMode == 1){ 
-//        camera_map.setSize( window.innerWidth, window.innerHeight );
-//        camera_map.updateProjectionMatrix();
-//    } else { 
-//        camera_battle.setSize( window.innerWidth, window.innerHeight );
-//        camera_battle.updateProjectionMatrix();
-//    }
-//    
-//
-//    renderer.setSize( window.innerWidth, window.innerHeight );
-//}
+window.addEventListener( 'resize', onWindowResize, false );
+function onWindowResize(){
+
+    if (sceneMode == 1){ 
+        camera_map.aspect = window.innerWidth / window.innerHeight;
+        camera_map.updateProjectionMatrix();
+    } else { 
+        camera_battle.aspect = window.innerWidth / window.innerHeight;
+        camera_battle.updateProjectionMatrix();
+    }
+    
+
+    renderer.setSize( window.innerWidth, window.innerHeight );    
+}
                     
 //functions for loaders
 var onProgress = function ( xhr ) { };
@@ -182,26 +184,12 @@ function loadModel(p_id, p_objFile, p_mtlFile, callback){
     }); //mtlLoader
 } //loadModel
 
+//lets users see stats with keyboard
 window.addEventListener('keydown', function(e){
     if (e.keyCode == 88) { //x
-        
-      setHUDLayout(3); //toggles stats screen
-//        if (sceneMode == 1){
-//            sceneMode = 2;
-//        } else {
-//            sceneMode = 1;
-//        }
-    }
-    
-    if (e.keyCode == 90) { //z
-        playerStats.coins += 10;
-    }
-    
-    if (e.keyCode == 67) { //c
-        updateStats(playerStats);
+        setHUDLayout(3); //toggles stats screen        
     }
 });
-
 
 //makes spirit boxes above players
 //taken from a pre r64 example, modified to work :)

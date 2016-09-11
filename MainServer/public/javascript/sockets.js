@@ -11,7 +11,8 @@ socket.on('connect', function(data) {
 
 //socket message for updates to player movement
 socket.on('movePlayer', function(data){ 
-    movePlayer(data.x, data.z, ("player" + data.device)); 
+    movePlayer(data.x, data.z, ("player" + data.device));  //moves player
+    movePlayer(data.x, data.z, ("playerSprite")); //moves player sprite above them
 });
 
 //used to handle differnt mode
@@ -44,12 +45,27 @@ socket.on('modeUpdate', function(data){
 socket.on('playerUpdate', function(data){ 
     if (data.device == deviceID) {       
         updateStats(data.player);
-        redrawHealthBar();
+        redrawHealthBar(); //incase player health changed
     }
 });
 
 //socket message for updates to pokemon list
-socket.on('pokemonUpdate', function(data){ 
+socket.on('modelUpdate', function(data){ 
+    
+    //checks for live update and toggle model visible
+    if (data.update.liveOff) {
+        scene_map.getObjectByName(data.name).visible = false;
+    } else if (data.update.liveOn) {
+        scene_map.getObjectByName(data.name).visible = true;
+    }
+    
+    //checks if health has been updated
+    if (data.update.health) {
+        healthPokemon.health = data.update.health;
+        redrawHealthBar();
+    }
+    
+    
     
 });
 

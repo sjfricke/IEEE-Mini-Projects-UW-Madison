@@ -18,9 +18,11 @@ var battleExport = module.exports = {
                 model_f.setHealth(pokemon.Name, pokemon.health - attack, function(result, err) {
                     
                     if (err) { return callback(-1, "MongoDB on server was not able to update"); }
+                    
+                    io.emit('modelUpdate', {"name" : pokemon.Name, "update" : { "health" : pokemon.health - attack } });
 
                     if (result.health <= 0) {
-                        //killed
+                        //killed pokemon
                         if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
                             player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value * .25)), "/updateScore") == -1 || 
                             player_f.updatePlayerList(player.device, "coins", Math.floor(player.coins + (pokemon.value * .25)), "/updateCoins") == -1
@@ -70,6 +72,8 @@ var battleExport = module.exports = {
                     
                     if (err) { return callback(-1, "MongoDB on server was not able to update"); }
 
+                    io.emit('modelUpdate', {"name" : pokemon.Name, "update" : { "health" : pokemon.health - attack } });
+                    
                     if (result.health <= 0) {
                         //killed
                         if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||

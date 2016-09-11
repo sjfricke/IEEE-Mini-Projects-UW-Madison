@@ -26,28 +26,6 @@ function init_battle() {
     scene_battle.add( playerObject );
     
     playerModelBattle = scene_battle.getObjectByName("player" + deviceID); //gives name to find
-
-//    var hudCanvas = document.createElement('canvas');
-//    hudCanvas.width = window.innerWidth;
-//    hudCanvas.height = window.innerHeight;
-//    var hudBitmap = hudCanvas.getContext('2d');
-//    hudBitmap.font = "Normal 40px Arial";
-//    hudBitmap.textAlign = 'center';
-//    hudBitmap.fillStyle = "rgba(245,245,245,0.75)";
-//    hudBitmap.fillText('Initializing...', window.innerWidth / 2, window.innerHeight / 2);
-//    var cameraHUD = new THREE.OrthographicCamera(
-//        -window.innerWidth/2, window.innerWidth/2,
-//        window.innerHeight/2, -window.innerHeight/2,
-//        0, 30
-//    );
-//    var hudTexture = new THREE.Texture(hudCanvas)
-//    hudTexture.needsUpdate = true;
-//    var material = new THREE.MeshBasicMaterial( {map: hudTexture } );
-//    material.transparent = true;
-//
-//    var planeGeometry = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
-//    var plane = new THREE.Mesh( planeGeometry, material );
-//    scene_battle.add( plane );
     
 }
 
@@ -81,6 +59,11 @@ function loadPokemon(pokemonName) {
         scene_battle.add( pokemonObject );
 
         pokemonModelBattle = scene_battle.getObjectByName(pokemonName); //gives name to find
+        
+        //gets health bar max and draws canvas again
+        healthPokemon.maxHealth = result.baseHealth;
+        healthPokemon.health = result.health;
+        redrawHealthBar();
         
         
     }); //Get call

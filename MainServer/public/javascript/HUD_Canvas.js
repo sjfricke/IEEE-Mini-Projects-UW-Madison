@@ -9,6 +9,7 @@ healthCanvas.width = window.innerWidth;
 healthCanvas.height = window.innerHeight;
 var context = healthCanvas.getContext('2d');
 
+//health objects for both the battle player model and pokemon model
 var healthPokemon = {
     x: healthCanvas.width / 5 ,
     y: 30,
@@ -28,7 +29,7 @@ var healthPlayer = {
 
 // Render Loop
 function redrawHealthBar() {
-//console.log("tick");    
+    
     // Clear the canvas
     healthCanvas.width = healthCanvas.width;
     
@@ -36,6 +37,7 @@ function redrawHealthBar() {
     var percentPokemon = healthPokemon.health / healthPokemon.maxHealth;
     var percentPlayer = playerStats.health / healthPlayer.maxHealth;
 
+    //draws health boxs using 2D web canvas strats
     context.fillStyle = "black";
     context.fillRect(healthPokemon.x, healthPokemon.y, healthPokemon.width, healthPokemon.height);
 

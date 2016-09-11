@@ -185,8 +185,6 @@ app.get('/move/:direction', function(req, res, next) {
     //fun of checking what they moved too
     model_f.checkSpace(currentPlayer, function(modelResult, err){ 
         //error with model checking
-        console.log("debug");
-        console.log(modelResult);
         if (err) { return res.send("BODY:" + err + "\0"); }
         
         if (modelResult == 1) {
@@ -196,6 +194,7 @@ app.get('/move/:direction', function(req, res, next) {
         
         if (modelResult.pokemonID == 200) {
             //pokeball
+            
             if (player_f.updatePlayerList(device, "items.Pokeball", currentPlayer.items.Pokeball + 1, "/updateItem") == -1) {
                 return callback(-1, "MongoDB on Pi was not able to update");
             } else {
@@ -207,6 +206,8 @@ app.get('/move/:direction', function(req, res, next) {
                     if (err) { return res.send("BODY:" + err + "\0"); }
                     
                     if (statusResult == -1) { return res.send("BODY:ERROR [3.0.1]\0"); }//no Pokeball by Name found 
+                    
+                    io.emit('modelUpdate', {"name" : modelResult.Name, "update" : "liveOff"}); //notifies all web clients
                                         
                     return res.send("BODY:Pokeball!\0"); 
                 });   
@@ -219,9 +220,9 @@ app.get('/move/:direction', function(req, res, next) {
             
             if (player_f.updatePlayerList(device, "health", 100, "/updateHealth") == -1) {
                 return res.send("BODY:MongoDB on Pi was not able to update\0");
-            }                
+            }
             
-            io.emit('playerUpdate', {"player" : currentPlayer, "device" : device}); 
+            io.emit('playerUpdate', {"player" : currentPlayer, "device" : device});
             
             return res.send("BODY:You have been given full health!\0");
             
@@ -254,7 +255,9 @@ app.get('/move/:direction', function(req, res, next) {
                 if (err) { return res.send("BODY:" + err + "\0"); }
 
                 if (statusResult == -1) { return res.send("BODY:ERROR [3.0.1]\0"); }//no Pokemon by Name found 
-
+                
+                io.emit('modelUpdate', {"name" : modelResult.Name, "update" : { "liveOff" : true } });
+                
                 //FINALLY returning a call back to client, about damn time
                 return res.send("BODY:A wild has " + modelResult.displayName + " appeared!\0");
             });                
@@ -324,15 +327,21 @@ app.get('/option/:value', function(req, res, next) {
     }
 });
 
+//used to see player list on server from browser
 app.get('/getPlayers', function(req, res, next) {
     res.json(_player.playerList);
 });
 
-
-app.get('/test', function(req, res, next) {
-//    mongoDB_f.test();
-//    res.send("done");
-//        player_f.test();
+//Used to test the server is up and running
+//also to teach how Express and ejs work
+app.get('/HelloWorld/:color', function(req, res, next) {
+    
+    var backgroundColor = req.params.color || "white"; //defaults if no param is passed
+    
+    res.render('HelloWorld', {
+        message: "Server is up and running",
+        color: backgroundColor        
+    });   
 });
 //-------------------------Sockets-----------------------------//
 

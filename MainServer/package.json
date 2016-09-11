@@ -1,7 +1,7 @@
 {
-  "name": "PiSockets_MainServer",
+  "name": "MainServer",
   "version": "1.0.0",
-  "description": "Main server to base PiSocket Examples",
+  "description": "Main server that runs the entire game",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

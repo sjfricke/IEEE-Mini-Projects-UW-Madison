@@ -17,7 +17,9 @@
 <script src="/lib/ThreeJs_Extra/loaders/MTLLoader.js"></script>
 <script src="/lib/ThreeJs_Extra/loaders/OBJLoader.js"></script>
     
+<!--Gets variable data from ejs that the server is sending-->
 <script> var deviceID = "<%= device %>"; console.log("Device ID: " + deviceID); </script>
+<script> var debugMode = <%= debugMode %>;</script>
 </head>
 <body>
     <canvas id="healthBar" style="z-index: 3; position: absolute; left:0px; top:0px; visibility: hidden;"></canvas>

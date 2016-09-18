@@ -85,7 +85,11 @@ function init_map() {
         scene_map.add( modelMesh );
         
     });
-    _player = [
+    
+    //If server is in debug mode player data can be fake set
+    //Used to no Pi to test with and want to work on front-end development
+    if (debugMode) {
+        _player = [
   {
     "_id": {
       "$oid": "57b139404c69c7b65351adb0"
@@ -150,6 +154,8 @@ function init_map() {
     "z": 52
   }
 ]
+    }
+    
     //load players
     _player.forEach(function(element) {
        

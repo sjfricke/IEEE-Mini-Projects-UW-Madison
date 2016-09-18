@@ -20,6 +20,8 @@ var localIP = require("ip").address(); //used to know where to check for web vie
 console.log("Local IP: " + localIP);
 
 var defaultPlayer = require('./setup/defaultPlayer'); //used as template for first time login
+
+var debugMode = false;
 //-------------------------getting funtions/routes from other files-----------------------------//
 //api to mongoose calls
 var api = require('./routes/api');
@@ -44,8 +46,17 @@ MongooseDB.once('open', function() {
   console.log("mongooseDB connection open");
 });
       
-    
-            //-------------------------Gets Players Info-----------------------------//
+//-------------------------Node Setup-----------------------------//
+//Loops through starting after "node server.js" and checks the arguments
+for (var i = 2; i < process.argv.length; i++) {
+    switch(process.argv[i]){
+        case "-debug":
+            console.log("RUNNING IN DEBUG MODE");
+            debugMode = true;
+    }
+}
+
+//-------------------------Gets Players Info-----------------------------//
 //sets up raw MongoDB Node Driver
 //get player online status
 MongoClient.connect(mongoURI, function(err, db) {
@@ -75,7 +86,7 @@ MongoClient.connect(mongoURI, function(err, db) {
 });
             
             
-            //-------------------------Gets Models Info-----------------------------//
+//-------------------------Gets Models Info-----------------------------//
 //grab all Pokemon to create a local statSheet and prevent a level of callbacks for each call
 //Things like attack, value, etc don't change
 var ModelSchema = require('./routes/models/models.model.js');
@@ -137,7 +148,7 @@ app.get('/login', function(req, res, next) {
 app.get('/getLink', function(req, res, next) {
     var device = parseInt( req.ip.split(/[.]+/).pop() );
     console.log("Getting Link for Device: " + device);
-    return res.send("BODY:Open Browser to: " + localIP + ":"+ server.address().port + "/play/" + device + "\n");
+    return res.send("BODY:Open Browser to: " + localIP + ":"+ server.address().port + "/player/" + device + "\n");
 });
 
 //takes care of moving
@@ -272,9 +283,10 @@ app.get('/move/:direction', function(req, res, next) {
 
 //device from 10.0.0.200 should be:
 // /play/200
-app.get('/play/:id', function(req, res, next) {    
+app.get('/player/:id', function(req, res, next) {    
     res.render('index', {
-        device: req.params.id
+        "device": req.params.id,
+        "debugMode": debugMode
     });   
 });
 

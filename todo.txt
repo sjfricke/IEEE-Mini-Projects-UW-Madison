@@ -10,7 +10,6 @@
 -Copy pi data to all SD cards
 -Make sure running 10+ Pis in Lab room works
 -Document C code better
--Change it so Pi gets body of response by new line and not the string "BODY:"
 -Fix MakeFile
     
     

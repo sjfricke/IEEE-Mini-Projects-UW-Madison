@@ -13,8 +13,7 @@
 #include <sys/socket.h>
 #include <signal.h>
 
-#define PORT 4000
-#define MAIN_SERVER "10.0.0.8"
+#include "util.h"
 
 int main(int argc , char *argv[])
 {
@@ -67,7 +66,7 @@ int main(int argc , char *argv[])
         puts("recv failed");
     }
     puts("Reply received\n");
-    response_body = strstr(server_reply,"BODY:")+5;
+    response_body = strstr(server_reply,"\r\n\r\n")+4;
     puts(response_body);
     puts("\n");
 

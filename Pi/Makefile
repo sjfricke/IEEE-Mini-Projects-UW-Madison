@@ -6,6 +6,7 @@ OBJ = socket/startSocket.o socket/getFunctions.o database/mongoStatus.o
 temp: server move login option
 
 clean: cleanMove cleanLogin cleanOption
+    rm runSocket
 
 server:
 	gcc -Wall -Werror -o runSocket socket/startSocket.c socket/helperFunctions.c socket/getFunctions.c database/mongoStatus.c socket/postFunctions.c database/mongoPokemon.c database/mongoPlayer.c $$(pkg-config --cflags --libs libmongoc-1.0)

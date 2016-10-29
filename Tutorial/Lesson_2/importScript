@@ -1,0 +1,5 @@
+#!/bin/bash
+
+mongoimport --db World --collection Population --drop --file Population.json
+mongoimport --db World --collection NobelPrize --drop --file NobelPrize.json
+mongoimport --db World --collection Companies --drop --file Companies.json

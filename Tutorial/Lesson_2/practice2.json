@@ -1,0 +1,32 @@
+{	
+	"Days" : ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"],
+	
+	"Random" : ["I", 333, "is cool", true],
+		
+	"Object" : {
+				 "Name" : "Billy",
+				"Age"  : 33,
+				"Year" : "1995"
+				},
+				
+	"Memebers" : {
+					"Spencer" : ["Male", 21, true],
+					"Max" : ["Male", 12, false],
+					"Thomas" : ["Male", 23, true],
+					"Manav" : ["Male", 26, true],
+				 },
+				 
+				 
+	"Empty"  : {},
+	
+	"Inception" : {
+				"Level2" : {
+							"Level3" : {
+										"Level4" : {
+													"Level5" : "Too Deep"
+													}
+										}						
+							}
+				
+				}
+}

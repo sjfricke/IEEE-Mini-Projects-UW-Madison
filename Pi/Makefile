@@ -1,14 +1,15 @@
 CC = gcc
 CFLAGS = -Wall -Werror -c
 MONGOFLAG = $(pkg-config --cflags --libs libmongoc-1.0)
-OBJ = socket/startSocket.o socket/getFunctions.o database/mongoStatus.o
+OBJ = socket/startServer.o socket/getFunctions.o database/mongoStatus.o
 
 temp: server move login option
 
 clean: cleanMove cleanLogin cleanOption
+    rm runServer
 
 server:
-	gcc -Wall -Werror -o runSocket socket/startSocket.c socket/helperFunctions.c socket/getFunctions.c database/mongoStatus.c socket/postFunctions.c database/mongoPokemon.c database/mongoPlayer.c $$(pkg-config --cflags --libs libmongoc-1.0)
+	gcc -Wall -Werror -o runServer socket/startServer.c socket/helperFunctions.c socket/getFunctions.c database/mongoStatus.c socket/postFunctions.c database/mongoPokemon.c database/mongoPlayer.c $$(pkg-config --cflags --libs libmongoc-1.0)
 
 move:
 	gcc -Wall -Werror -o move client/move.c

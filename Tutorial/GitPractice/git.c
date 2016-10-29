@@ -1,6 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-int main(void) {
-	printf("Add to this file below and commit it")
-	//NOTE: if you add something cool or funny I will accept the pull request :)
+int main(int argc, char *argv[]) {
+    
+    int i;
+    
+    for (i = 0; i < argc; i++) {
+        printf("%d\t", i);
+        printf("%s\n", argv[i]);
+    }
+    
 }

@@ -137,9 +137,9 @@ app.get('/login', function(req, res, next) {
           });
         });
         
-        return res.send("BODY:All ready to catch'em all!\n\0");
+        return res.send("All ready to catch'em all!\n\0");
     } else {
-        return res.send("BODY:All ready logged in!\n\0");
+        return res.send("All ready logged in!\n\0");
     }
     
 });
@@ -148,7 +148,7 @@ app.get('/login', function(req, res, next) {
 app.get('/getLink', function(req, res, next) {
     var device = parseInt( req.ip.split(/[.]+/).pop() );
     console.log("Getting Link for Device: " + device);
-    return res.send("BODY:Open Browser to: " + localIP + ":"+ server.address().port + "/player/" + device + "\n");
+    return res.send("Open Browser to: " + localIP + ":"+ server.address().port + "/player/" + device + "\n");
 });
 
 //takes care of moving
@@ -159,29 +159,29 @@ app.get('/move/:direction', function(req, res, next) {
     var player = player_f.checkForPlayer(device, _player.playerList);
     //checks if player is valid
     if (player == -1) { //not valid player
-        return res.send("BODY:Player has not logged in to this game session\n use Login script to login\0");
+        return res.send("Player has not logged in to this game session\n use Login script to login\0");
     }
     
     //up = 0, right = 1, down = 2, left = 3, invalid = -1
     var direction = player_f.getDirection(req.params.direction);
     //checks for invalid option
     if (direction < 0) {
-        return res.send("BODY:" + req.params.direction + " is an invalid move\noptions:\nup, right, left, down\0");
+        return res.send("" + req.params.direction + " is an invalid move\noptions:\nup, right, left, down\0");
     }
     
     var validMove = player_f.checkValidMove(player, direction);
     //checks if move is valid
     if (validMove == -1) { //in battle
-        return res.send("BODY:Player is currently in a battle\0");
+        return res.send("Player is currently in a battle\0");
     } else if (validMove == -2) { //off map
-        return res.send("BODY:Player is at edge of map and cannot move that way\0");
+        return res.send("Player is at edge of map and cannot move that way\0");
     } 
     
     //If player is moving out of Market
     if (player.mode == "1") {
         
         if (player_f.updatePlayerList(device, "mode", "0", "/updateMode") == -1) {
-            return res.send("BODY:MongoDB on Pi was not able to update\0");
+            return res.send("MongoDB on Pi was not able to update\0");
         }                
         //updates mode to all web viewers
         io.emit('modeUpdate', {"mode" : "0", "device" : device}); 
@@ -189,18 +189,18 @@ app.get('/move/:direction', function(req, res, next) {
     
     //updates local copy
     var currentPlayer = player_f.updatePlayerList(device, validMove.bodyKey, validMove.bodyValue, "/movePlayer");    
-    if (currentPlayer == -1) { return res.send("BODY:MongoDB on Pi was not able to update\0"); }    
+    if (currentPlayer == -1) { return res.send("MongoDB on Pi was not able to update\0"); }    
     //updates player positions to all web viewers
     io.emit('movePlayer', {"x" : currentPlayer.x, "z" : currentPlayer.z, "device" : device}); 
         
     //fun of checking what they moved too
     model_f.checkSpace(currentPlayer, function(modelResult, err){ 
         //error with model checking
-        if (err) { return res.send("BODY:" + err + "\0"); }
+        if (err) { return res.send("ERROR:" + err + "\0"); }
         
         if (modelResult == 1) {
             //moved and nothing was there
-            return res.send("BODY:Moved " + req.params.direction + "\0");
+            return res.send("Moved " + req.params.direction + "\0");
         }
         
         if (modelResult.pokemonID == 200) {
@@ -214,13 +214,13 @@ app.get('/move/:direction', function(req, res, next) {
                 
                 //sets model to offline after found
                 model_f.setOnlineStatus(modelResult.Name, false, function(statusResult, err){
-                    if (err) { return res.send("BODY:" + err + "\0"); }
+                    if (err) { return res.send("ERROR:" + err + "\0"); }
                     
-                    if (statusResult == -1) { return res.send("BODY:ERROR [3.0.1]\0"); }//no Pokeball by Name found 
+                    if (statusResult == -1) { return res.send("ERROR [3.0.1]\0"); }//no Pokeball by Name found 
                     
                     io.emit('modelUpdate', {"name" : modelResult.Name, "update" : "liveOff"}); //notifies all web clients
                                         
-                    return res.send("BODY:Pokeball!\0"); 
+                    return res.send("Pokeball!\0"); 
                 });   
                 
                  
@@ -230,24 +230,24 @@ app.get('/move/:direction', function(req, res, next) {
             //pokeCenter
             
             if (player_f.updatePlayerList(device, "health", 100, "/updateHealth") == -1) {
-                return res.send("BODY:MongoDB on Pi was not able to update\0");
+                return res.send("MongoDB on Pi was not able to update\0");
             }
             
             io.emit('playerUpdate', {"player" : currentPlayer, "device" : device});
             
-            return res.send("BODY:You have been given full health!\0");
+            return res.send("You have been given full health!\0");
             
         } else if (modelResult.pokemonID == 202) {
             //pokeMart
             //mode set to 1
             
             if (player_f.updatePlayerList(device, "mode", "1", "/updateMode") == -1) {
-                return res.send("BODY:MongoDB on Pi was not able to update\0");
+                return res.send("MongoDB on Pi was not able to update\0");
             }                
             //updates mode to all web viewers
             io.emit('modeUpdate', {"mode" : "1", "device" : device}); 
             
-            return res.send("BODY:Want to buy an item?\0");
+            return res.send("Want to buy an item?\0");
             
         } else {
             //pokemon
@@ -256,21 +256,21 @@ app.get('/move/:direction', function(req, res, next) {
             var battleMode = "2" + modelResult.Name;
 
             if (player_f.updatePlayerList(device, "mode", battleMode, "/updateMode") == -1) {
-                return res.send("BODY:MongoDB on Pi was not able to update\0");
+                return res.send("MongoDB on Pi was not able to update\0");
             }                
             //updates mode to all web viewers
             io.emit('modeUpdate', {"mode" : battleMode, "device" : device}); 
 
             //set pokemon to offline
             model_f.setOnlineStatus(modelResult.Name, false, function(statusResult, err){
-                if (err) { return res.send("BODY:" + err + "\0"); }
+                if (err) { return res.send("ERROR:" + err + "\0"); }
 
-                if (statusResult == -1) { return res.send("BODY:ERROR [3.0.1]\0"); }//no Pokemon by Name found 
+                if (statusResult == -1) { return res.send("ERROR [3.0.1]\0"); }//no Pokemon by Name found 
                 
                 io.emit('modelUpdate', {"name" : modelResult.Name, "update" : { "liveOff" : true } });
                 
                 //FINALLY returning a call back to client, about damn time
-                return res.send("BODY:A wild has " + modelResult.displayName + " appeared!\0");
+                return res.send("A wild has " + modelResult.displayName + " appeared!\0");
             });                
             
         }
@@ -298,14 +298,14 @@ app.get('/option/:value', function(req, res, next) {
     var player = player_f.checkForPlayer(device, _player.playerList); //gets player info
     //checks if player is valid
     if (player == -1) { //not valid player
-        return res.send("BODY:Player has not logged in to this game session\n use Login script to login\0");
+        return res.send("Player has not logged in to this game session\n use Login script to login\0");
     }
     
     //checks for valid number sent
     try {
         var optionValue = parseInt(req.params.value);
     } catch(e) {
-        return res.send("BODY:No non numbers in option choice\0");
+        return res.send("No non numbers in option choice\0");
     }
     
     //Check for the mode in use
@@ -313,29 +313,29 @@ app.get('/option/:value', function(req, res, next) {
         //In Mart
         
         player_f.martOption(player, optionValue, function(optionResult, err){
-            if (err) { return res.send("BODY:" + err + "\0"); }
+            if (err) { return res.send("ERROR: " + err + "\0"); }
             
             //updates stats to all web viewers
             io.emit('playerUpdate', {"player" : player, "device" : device}); 
             
-            return res.send("BODY:" + optionResult + "\0");
+            return res.send(optionResult + "\0");
             
         });
         
     } else if (player.mode.substring(0,1) == '2') {
         //Battle
         battle_f.option(player, optionValue, function(optionResult, err){
-            if (err) { return res.send("BODY:" + err + "\0"); }
+            if (err) { return res.send("ERROR: " + err + "\0"); }
                 
             //updates stats to all web viewers
             io.emit('playerUpdate', {"player" : player, "device" : device}); 
             
-            return res.send("BODY:" + optionResult + "\0");
+            return res.send(optionResult + "\0");
             
         });
         
     } else {
-        return res.send("BODY:No Options avaiable for use here\0");
+        return res.send("No Options avaiable for use here\0");
     }
 });
 

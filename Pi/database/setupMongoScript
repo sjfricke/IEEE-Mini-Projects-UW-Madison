@@ -1,0 +1,11 @@
+#!/bin/bash
+#Used to setup mongoDB from scratch in terms of setting the correct DB and Collections
+mongoimport --db IEEE --collection Player --drop --file Player.json
+deviceID="$(hostname -I)"
+deviceID="${deviceID:10:3}"
+MongoEval="db.Player.update({device : {\$gte : 0}}, {\$set: {device : NumberInt($deviceID)} });"
+echo $MongoEval
+mongo <<EOF
+use IEEE
+$MongoEval
+EOF

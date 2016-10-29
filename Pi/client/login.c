@@ -59,7 +59,8 @@ int main(int argc , char *argv[])
         puts("recv failed");
     }
     puts("Reply received\n");
-    response_body = strstr(server_reply,"BODY:")+5;
+    
+    response_body = strstr(server_reply,"\n");
     puts(response_body);
     puts("\n");
 

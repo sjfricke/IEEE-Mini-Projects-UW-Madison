@@ -213,8 +213,8 @@ function movePlayer(xVal, zVal, objectName) {
     
     var modelMoving = scene_map.getObjectByName(objectName);
     
-    modelMoving.position.z = xVal;
-    modelMoving.position.x = zVal;     
+    modelMoving.position.x = xVal;
+    modelMoving.position.z = zVal;     
     
     if (modelMoving == playerModel) {
         controls_map.target = playerModel.position; //sets the aim of the orbit control for user player model

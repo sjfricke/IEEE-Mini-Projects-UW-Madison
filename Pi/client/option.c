@@ -19,7 +19,21 @@ int main(int argc , char *argv[])
 {
     if (argc < 2) {
         puts("Need to pass an option value\n");
-        puts("Options: a, b, c, d, e, f\n");
+        puts("Battle Options:");
+            puts("\t1 - Light Attack");
+            puts("\t2 - Big Attack");
+            puts("\t3 - Run");
+            puts("\t4 - Pokeball");
+            puts("\t5 - GreatBall");
+            puts("\t6 - UltraBall");
+            puts("\t7 - Potion");
+            puts("\t8 - Super Potion");  
+        puts("Mart Options:");
+            puts("\t1 - Pokeball - 200 coins");
+            puts("\t2 - Greatball - 400 coins");
+            puts("\t3 - Ultraball - 700 coins");
+            puts("\t4 - Potion - 200 coins");
+            puts("\t5 - Super Potion - 350 coins");
         return -1;
     }
 
@@ -34,9 +48,9 @@ int main(int argc , char *argv[])
         printf("Could not create socket");
     }
 
-    server.sin_addr.s_addr = inet_addr(MAIN_SERVER);
+    server.sin_addr.s_addr = inet_addr( MAIN_SERVER_IP );
     server.sin_family = AF_INET;
-    server.sin_port = htons( 8000 );
+    server.sin_port = htons( MAIN_SERVER_PORT );
 
     //Connect to remote server
     if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0)
@@ -45,7 +59,7 @@ int main(int argc , char *argv[])
         return 1;
     }
 
-    puts("Connected\n");
+    puts("Connected");
 
     //Send some data
     strcpy (message, "GET /option/");
@@ -65,7 +79,7 @@ int main(int argc , char *argv[])
     {
         puts("recv failed");
     }
-    puts("Reply received\n");
+    puts("Reply received");
     
     response_body = strstr(server_reply,"\r\n\r\n")+4;
     puts(response_body);

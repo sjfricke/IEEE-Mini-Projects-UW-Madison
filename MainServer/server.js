@@ -281,7 +281,7 @@ app.get('/move/:direction', function(req, res, next) {
    
 }); //end of get('/move')
 
-//device from 10.0.0.200 should be:
+//device from 192.168.1.200 should be:
 // /play/200
 app.get('/player/:id', function(req, res, next) {    
     res.render('index', {
@@ -305,7 +305,7 @@ app.get('/option/:value', function(req, res, next) {
     try {
         var optionValue = parseInt(req.params.value);
     } catch(e) {
-        return res.send("No non numbers in option choice\0");
+        return res.send("No non-numbers in option choice\0");
     }
     
     //Check for the mode in use

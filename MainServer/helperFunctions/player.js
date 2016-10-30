@@ -130,7 +130,7 @@ module.exports = {
             var raw_request = "GET /player HTTP/1.1";
             var responseData = "";
 
-            client.connect(5000, "10.0.0." + element, function() {
+            client.connect(5000, "192.168.1." + element, function() {
                 console.log(element + ' Connected');
                 client.write(raw_request);
             });
@@ -258,7 +258,7 @@ module.exports = {
         var raw_request = "POST " + postCall + " HTTP/1.1\n" + "{ " + bodyKey + " : " + bodyValue + " }\0";
         var responseData = "";
 
-        client.connect(5000, "10.0.0." + device, function() {
+        client.connect(5000, "192.168.1." + device, function() {
             console.log('Connected');
             client.write(raw_request);
         });

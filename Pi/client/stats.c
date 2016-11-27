@@ -18,9 +18,9 @@
 int main(int argc , char *argv[])
 {
     if (argc < 2) {
-        puts("Need to pass a 2nd argument");
+        puts("Need to pass a 2nd argument\n");
         puts("Options: <player number>");
-            puts("\tReturns stats on that player number\n");
+            puts("\tReturns stats on that player number");
             puts("\tExample: ./stats 42\n");
         puts("Options: all");
             puts("\tReturns stats on all live players");

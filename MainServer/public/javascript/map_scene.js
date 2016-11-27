@@ -173,7 +173,7 @@ function init_map() {
         spritey.position.set(element.x, 6,element.z );
         scene_map.add( spritey );
         
-        //gets mode of this player
+        //gets mode of this device player
         if (element.device == deviceID) {
             
             //this will allow us to move the sprite name with the player

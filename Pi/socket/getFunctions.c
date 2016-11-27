@@ -30,6 +30,7 @@ void getStatus(char** returnMessage){
     getStatusMongo(returnMessage);
 }
 
+// These are hardcoded to show how get request works
 void getHealth(char** returnMessage){
     strcpy (*returnMessage, "55hp");
 }

@@ -2,6 +2,10 @@ var net = require('net');
 var _player = require('./playerList');
 var io = require('../sockets').get_io();
 
+// gets IP header for finding Pis
+var SERVER_IP_HEADER = require("ip").address();
+SERVER_IP_HEADER = SERVER_IP_HEADER.substring(0,SERVER_IP_HEADER.lastIndexOf(".")+1);
+
 module.exports = {
     
     login: function(deviceID) {
@@ -12,7 +16,7 @@ module.exports = {
     updatePlayerList: function(device, bodyKey, bodyValue, postURL) {
         var currentPlayer = -2; //returns if no players updated
         
-        var confirm = this.confirmPlayerData(postURL, device, bodyKey, bodyValue);    
+        var confirm = this.confirmPlayerData(1, postURL, device, bodyKey, bodyValue);  
         if (confirm == -1) { return -1; }
         
         _player.playerList.forEach(function(element, index){
@@ -21,13 +25,34 @@ module.exports = {
                 //because the bodyKey might be two deep in json, we need to eval it
                 eval("element." + bodyKey + " = bodyValue");   
                 currentPlayer = element;                
-                console.log("updated " + bodyKey + " locally");
+                console.log("updated " + bodyKey + " locally for device: " + device);
             } 
 
         });
         return currentPlayer;
     },
-    
+    //updates player
+    //will return player when done
+    updatePlayerListAsync: function(device, bodyKey, bodyValue, postURL, callback) {
+        var currentPlayer = -2; //returns if no players updated
+        
+        this.confirmPlayerData(1, postURL, device, bodyKey, bodyValue, function(confirm){
+            if (confirm == -1 || !confirm) { return callback(-1); }
+
+            _player.playerList.forEach(function(element, index){
+
+                if (element.device == device) {
+                    //because the bodyKey might be two deep in json, we need to eval it
+                    eval("element." + bodyKey + " = bodyValue");   
+                    currentPlayer = element;                
+                    console.log("updated " + bodyKey + " locally for device: " + device);
+                } 
+
+            });
+            return callback(currentPlayer);
+            
+        });  
+    },
     martOption: function(player, optionValue, callback) {
         
         switch(optionValue) {
@@ -130,7 +155,7 @@ module.exports = {
             var raw_request = "GET /player HTTP/1.1";
             var responseData = "";
 
-            client.connect(5000, "192.168.1." + element, function() {
+            client.connect(5000, SERVER_IP_HEADER + element, function() {
                 console.log(element + ' Connected');
                 client.write(raw_request);
             });
@@ -144,8 +169,9 @@ module.exports = {
             client.on('close', function() {
                 console.log(element + ' Connection closed');
                 asyncReturnCount++;
-                try {
-                    returnList.push(JSON.parse(responseData));
+                try {                    
+                    //null string returned on empty query
+                    if (responseData != "null") returnList.push(JSON.parse(responseData));
                 } catch(e){
                     console.log(element + " Not returning JSON:");    
                     console.log(responseData);    
@@ -251,32 +277,53 @@ module.exports = {
     },    
     
     //sends back data to Pi and will be able to validate the pi has been updated
-    confirmPlayerData: function(postCall, device, bodyKey, bodyValue){
+    confirmPlayerData: function(verb, postCall, device, bodyKey, bodyValue, callback){
         var client = new net.Socket();
         client.setTimeout(2000);
         
-        var raw_request = "POST " + postCall + " HTTP/1.1\n" + "{ " + bodyKey + " : " + bodyValue + " }\0";
+        var verbType;
+        
+        if (verb == 1) verbType = "POST";
+        else if (verb == 2) verbType = "GET";
+        else verbType = "POST";
+        
+        var raw_request = verbType + " " + postCall + " HTTP/1.1\n" + "{ " + bodyKey + " : " + bodyValue + " }\0";
         var responseData = "";
+        var errorOccured = false;
 
-        client.connect(5000, "192.168.1." + device, function() {
-            console.log('Connected');
+        client.connect(5000, SERVER_IP_HEADER + device, function() {
+            console.log('Connected with: ' + device);
             client.write(raw_request);
         });
 
         client.on('data', function(data) {
-            console.log('Received: ' + data);
+            console.log('Received from ' + device + ": " + data);
             responseData += data;
             client.destroy(); // kill client after server's response
         });
 
         client.on('close', function() {
-            console.log('Connection closed');
-            return responseData;
+            console.log('Connection closed with device: ' + device);
+            //prevents an error from double sending
+            if (!errorOccured) {
+                if (callback) {                
+                    return callback(responseData);
+                } else {                
+                    return responseData;
+                }
+            }
+            
         });
         
         client.on('error', function() {
             console.log('Connection Failed with ' + device);
-            return -1;
+            errorOccured = true;
+            if (callback) {                
+                return callback(-1);
+            } else {                
+                return -1;
+            }
+            
         });
         
         

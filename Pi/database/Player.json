@@ -1,1 +1,1 @@
-{ "baseAttack" : "50", "coins" : 0, "device" : 20, "health" : 100, "items" : { "Potion" : 3, "SuperPotion" : 1, "Pokeball" : 6, "Greatball" : 1, "Ultraball" : 0 }, "mode" : "0", "online" : false, "score" : 0, "x" : -12, "z" : 12 }
+{ "baseAttack" : "50", "baseDefence" : "200", "coins" : 100, "device" : 20, "health" : 100, "items" : { "Potion" : 1, "SuperPotion" : 0, "Pokeball" : 6, "Greatball" : 1, "Ultraball" : 0 }, "mode" : "0", "score" : 0, "x" : -4, "z" : 4 }

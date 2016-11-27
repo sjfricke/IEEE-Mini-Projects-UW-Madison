@@ -130,7 +130,7 @@ function init(){
     
     //gets list of players
     //init scenes after loaded
-    $.get("/getPlayers", function(result){
+    $.get("/getPlayers/all", function(result){
         //TODO right now only will grab players online when page loads
         _player = result;
         

@@ -123,25 +123,40 @@ app.get('/login', function(req, res, next) {
     
     var player = player_f.checkForPlayer(device, _player.playerList);
     
+    // is player logged in already  
     if (player == -1) {
-        var newPlayer = extend({}, defaultPlayer); //makes copy of template
-        newPlayer.device = device; //change device ID
-        _player.playerList.push(newPlayer); //adds to list
         
-        //adds to database
-        MongoClient.connect(mongoURI, function(err, db) {
-            assert.equal(null, err);
+        //check if Pi has its own player data
+        player_f.confirmPlayerData(2, "/player", device, "", "", function(data){
 
-          mongoDB_f.setOnline(db, device, function() {
-              db.close();
-          });
-        });
+            if (data == "null") {            
+                //not logged in
+                return res.send("You need to set your Database up!\nrun setupMongoScript under /database\0");
+                /* This makes template data, should get from Pi
+                var newPlayer = extend({}, defaultPlayer); //makes copy of template
+                newPlayer.device = device; //change device ID
+                _player.playerList.push(newPlayer); //adds to list*/
+            } else {
+
+                _player.playerList.push(JSON.parse(data));
+
+                //adds to database
+                MongoClient.connect(mongoURI, function(err, db) {
+                    assert.equal(null, err);
+
+                  mongoDB_f.setOnline(db, device, function() {
+                      db.close();
+                  });
+                });
+
+                    return res.send("All ready to catch'em all!\n\0");
+            }
+        }); //confirm player data
         
-        return res.send("All ready to catch'em all!\n\0");
     } else {
         return res.send("All ready logged in!\n\0");
-    }
-    
+    }     
+       
 });
 
 //Will return link to view online graphics
@@ -188,95 +203,99 @@ app.get('/move/:direction', function(req, res, next) {
     }
     
     //updates local copy
-    var currentPlayer = player_f.updatePlayerList(device, validMove.bodyKey, validMove.bodyValue, "/movePlayer");    
-    if (currentPlayer == -1) { return res.send("MongoDB on Pi was not able to update\0"); }    
-    //updates player positions to all web viewers
-    io.emit('movePlayer', {"x" : currentPlayer.x, "z" : currentPlayer.z, "device" : device}); 
+    player_f.updatePlayerListAsync(device, validMove.bodyKey, validMove.bodyValue, "/movePlayer", function(currentPlayer){
         
-    //fun of checking what they moved too
-    model_f.checkSpace(currentPlayer, function(modelResult, err){ 
-        //error with model checking
-        if (err) { return res.send("ERROR:" + err + "\0"); }
-        
-        if (modelResult == 1) {
-            //moved and nothing was there
-            return res.send("Moved " + req.params.direction + "\0");
-        }
-        
-        if (modelResult.pokemonID == 200) {
-            //pokeball
-            
-            if (player_f.updatePlayerList(device, "items.Pokeball", currentPlayer.items.Pokeball + 1, "/updateItem") == -1) {
-                return callback(-1, "MongoDB on Pi was not able to update");
+        if (currentPlayer == -1) { return res.send("MongoDB on Pi was not able to update\nIs the runServer script going?\0"); }    
+        //updates player positions to all web viewers
+        io.emit('movePlayer', {"x" : currentPlayer.x, "z" : currentPlayer.z, "device" : device}); 
+
+        //fun of checking what they moved too
+        model_f.checkSpace(currentPlayer, function(modelResult, err){ 
+            //error with model checking
+            if (err) { return res.send("ERROR:" + err + "\0"); }
+
+            if (modelResult == 1) {
+                //moved and nothing was there
+                return res.send("Moved " + req.params.direction + "\0");
+            }
+
+            if (modelResult.pokemonID == 200) {
+                //pokeball
+
+                if (player_f.updatePlayerList(device, "items.Pokeball", currentPlayer.items.Pokeball + 1, "/updateItem") == -1) {
+                    return callback(-1, "MongoDB on Pi was not able to update");
+                } else {
+
+                    io.emit('playerUpdate', {"player" : currentPlayer, "device" : device}); 
+
+                    //sets model to offline after found
+                    model_f.setOnlineStatus(modelResult.Name, false, function(statusResult, err){
+                        if (err) { return res.send("ERROR:" + err + "\0"); }
+
+                        if (statusResult == -1) { return res.send("ERROR [3.0.1]\0"); }//no Pokeball by Name found 
+
+                        io.emit('modelUpdate', {"name" : modelResult.Name, "update" : "liveOff"}); //notifies all web clients
+
+                        return res.send("Pokeball!\0"); 
+                    });   
+
+
+                }        
+
+            } else if (modelResult.pokemonID == 201) {
+                //pokeCenter
+
+                if (player_f.updatePlayerList(device, "health", 100, "/updateHealth") == -1) {
+                    return res.send("MongoDB on Pi was not able to update\0");
+                }
+
+                io.emit('playerUpdate', {"player" : currentPlayer, "device" : device});
+
+                return res.send("You have been given full health!\0");
+
+            } else if (modelResult.pokemonID == 202) {
+                //pokeMart
+                //mode set to 1
+
+                if (player_f.updatePlayerList(device, "mode", "1", "/updateMode") == -1) {
+                    return res.send("MongoDB on Pi was not able to update\0");
+                }                
+                //updates mode to all web viewers
+                io.emit('modeUpdate', {"mode" : "1", "device" : device}); 
+
+                return res.send("Want to buy an item?\0");
+
             } else {
-                
-                io.emit('playerUpdate', {"player" : currentPlayer, "device" : device}); 
-                
-                //sets model to offline after found
+                //pokemon
+
+                //set player mode to battle
+                var battleMode = "2" + modelResult.Name;
+
+                if (player_f.updatePlayerList(device, "mode", battleMode, "/updateMode") == -1) {
+                    return res.send("MongoDB on Pi was not able to update\0");
+                }                
+                //updates mode to all web viewers
+                io.emit('modeUpdate', {"mode" : battleMode, "device" : device}); 
+
+                //set pokemon to offline
                 model_f.setOnlineStatus(modelResult.Name, false, function(statusResult, err){
                     if (err) { return res.send("ERROR:" + err + "\0"); }
-                    
-                    if (statusResult == -1) { return res.send("ERROR [3.0.1]\0"); }//no Pokeball by Name found 
-                    
-                    io.emit('modelUpdate', {"name" : modelResult.Name, "update" : "liveOff"}); //notifies all web clients
-                                        
-                    return res.send("Pokeball!\0"); 
-                });   
-                
-                 
-            }        
-                       
-        } else if (modelResult.pokemonID == 201) {
-            //pokeCenter
-            
-            if (player_f.updatePlayerList(device, "health", 100, "/updateHealth") == -1) {
-                return res.send("MongoDB on Pi was not able to update\0");
+
+                    if (statusResult == -1) { return res.send("ERROR [3.0.1]\0"); }//no Pokemon by Name found 
+
+                    io.emit('modelUpdate', {"name" : modelResult.Name, "update" : { "liveOff" : true } });
+
+                    //FINALLY returning a call back to client, about damn time
+                    return res.send("A wild has " + modelResult.displayName + " appeared!\0");
+                });                
+
             }
-            
-            io.emit('playerUpdate', {"player" : currentPlayer, "device" : device});
-            
-            return res.send("You have been given full health!\0");
-            
-        } else if (modelResult.pokemonID == 202) {
-            //pokeMart
-            //mode set to 1
-            
-            if (player_f.updatePlayerList(device, "mode", "1", "/updateMode") == -1) {
-                return res.send("MongoDB on Pi was not able to update\0");
-            }                
-            //updates mode to all web viewers
-            io.emit('modeUpdate', {"mode" : "1", "device" : device}); 
-            
-            return res.send("Want to buy an item?\0");
-            
-        } else {
-            //pokemon
-            
-            //set player mode to battle
-            var battleMode = "2" + modelResult.Name;
 
-            if (player_f.updatePlayerList(device, "mode", battleMode, "/updateMode") == -1) {
-                return res.send("MongoDB on Pi was not able to update\0");
-            }                
-            //updates mode to all web viewers
-            io.emit('modeUpdate', {"mode" : battleMode, "device" : device}); 
 
-            //set pokemon to offline
-            model_f.setOnlineStatus(modelResult.Name, false, function(statusResult, err){
-                if (err) { return res.send("ERROR:" + err + "\0"); }
-
-                if (statusResult == -1) { return res.send("ERROR [3.0.1]\0"); }//no Pokemon by Name found 
-                
-                io.emit('modelUpdate', {"name" : modelResult.Name, "update" : { "liveOff" : true } });
-                
-                //FINALLY returning a call back to client, about damn time
-                return res.send("A wild has " + modelResult.displayName + " appeared!\0");
-            });                
-            
-        }
+        }); //end of checkSpace
         
-        
-    }); //end of checkSpace
+    });  //update player
+   
     
    
 }); //end of get('/move')
@@ -347,17 +366,18 @@ app.get('/getPlayers/:player', function(req, res, next) {
     
     if (req.params.player == "all") {        
         res.json(_player.playerList);
+    
     } else if (req.params.player == "me") {
         _player.playerList.forEach(function(element, index, array){
             if (element.device ==  device) {
                 res.send(JSON.stringify(element, null, "\t"));
-                res.json(element);
                 found = true;
                 return;
             }
         });
         //if not found
         if (!found) res.send("Could not find you! Did you rememeber to login?");
+   
     } else {
         _player.playerList.forEach(function(element, index, array){
             if (element.device == req.params.player) {

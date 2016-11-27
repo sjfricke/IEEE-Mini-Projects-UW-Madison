@@ -5,7 +5,7 @@ OBJ = socket/startServer.o socket/getFunctions.o database/mongoStatus.o
 
 temp: server move login option stats
 
-clean: cleanMove cleanLogin cleanOption
+clean: cleanMove cleanLogin cleanOption cleanStats
 	rm runServer
 
 server:

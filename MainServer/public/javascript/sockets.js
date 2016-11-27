@@ -34,7 +34,7 @@ socket.on('modeUpdate', function(data){
         } else if (data.mode.substring(0,1) == "2") {
         //battle mode
             sceneMode = 2;
-            loadPokemon(element.mode.substring(1));
+            loadPokemon(data.mode.substring(1));
             setHUDLayout(1);
             
         }

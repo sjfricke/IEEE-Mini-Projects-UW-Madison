@@ -1,8 +1,7 @@
 {
     "device" : 0,
-    "online" : false,
-    "x" : 0,
-    "z" : 0,
+    "x" : -4,
+    "z" : 4,
     "mode" : "0",
     "score" : 0,
     "coins" : 100,
@@ -14,5 +13,6 @@
             "Ultraball" : 0    
         }, 
     "baseAttack": 50,
-    "baseDefence": 200
+    "baseDefence": 200,
+    "health" : 100
 }

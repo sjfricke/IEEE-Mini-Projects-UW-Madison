@@ -15,8 +15,8 @@ void getStatusMongo(char** queryResult){
     mongoc_init ();
 
     client = mongoc_client_new ("mongodb://localhost:27017/");
-    collection = mongoc_client_get_collection (client, "IEEE", "Status");
-    query = BCON_NEW ("$query", "{", "User", BCON_UTF8 ("Me"), "}");
+    collection = mongoc_client_get_collection (client, "IEEE", "Player");
+    query = BCON_NEW ("$query", "{", "}");
     cursor = mongoc_collection_find (collection, MONGOC_QUERY_NONE, 0, 0, 0, query, NULL, NULL);
 
     while (mongoc_cursor_next (cursor, &doc)) {
@@ -42,12 +42,15 @@ void getPlayerMongo(char** queryResult){
     const bson_t *doc;
     bson_t *query;
     char *str;
-
+    
+    //sets as null incase query returns empty
+    strcpy (*queryResult, "null");
+    
     mongoc_init ();
 
     client = mongoc_client_new ("mongodb://localhost:27017/");
     collection = mongoc_client_get_collection (client, "IEEE", "Player");
-    query = BCON_NEW ("$query", "{", "score", "{", "$gt", BCON_INT32(-1), "}", "}"); //checks for score over -1
+    query = BCON_NEW ("$query", "{", "}"); //checks for score over -1
     cursor = mongoc_collection_find (collection, MONGOC_QUERY_NONE, 0, 1, 0, query, NULL, NULL); //limits to 1 query
 
     while (mongoc_cursor_next (cursor, &doc)) {

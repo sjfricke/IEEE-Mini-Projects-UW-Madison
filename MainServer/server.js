@@ -340,8 +340,35 @@ app.get('/option/:value', function(req, res, next) {
 });
 
 //used to see player list on server from browser
-app.get('/getPlayers', function(req, res, next) {
-    res.json(_player.playerList);
+app.get('/getPlayers/:player', function(req, res, next) {
+    
+    var device = parseInt( req.ip.split(/[.]+/).pop() ); //gets player device that sent request
+    var found = false;
+    
+    if (req.params.player == "all") {        
+        res.json(_player.playerList);
+    } else if (req.params.player == "me") {
+        _player.playerList.forEach(function(element, index, array){
+            if (element.device ==  device) {
+                res.send(JSON.stringify(element, null, "\t"));
+                res.json(element);
+                found = true;
+                return;
+            }
+        });
+        //if not found
+        if (!found) res.send("Could not find you! Did you rememeber to login?");
+    } else {
+        _player.playerList.forEach(function(element, index, array){
+            if (element.device == req.params.player) {
+                res.json(element);
+                found = true;
+                return;
+            }
+        });
+        //if not found
+        if (!found) res.send("Could not find " + req.params.player);
+    }
 });
 
 //Used to test the server is up and running

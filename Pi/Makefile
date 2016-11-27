@@ -3,7 +3,7 @@ CFLAGS = -Wall -Werror -c
 MONGOFLAG = $(pkg-config --cflags --libs libmongoc-1.0)
 OBJ = socket/startServer.o socket/getFunctions.o database/mongoStatus.o
 
-temp: server move login option
+temp: server move login option stats
 
 clean: cleanMove cleanLogin cleanOption
 	rm runServer
@@ -19,6 +19,9 @@ login:
 
 option:
 	gcc -Wall -Werror -o option client/option.c
+    
+stats:
+	gcc -Wall -Werror -o stats client/stats.c
 
 cleanMove:
 	rm move
@@ -28,3 +31,7 @@ cleanLogin:
 
 cleanOption:
 	rm option
+    
+cleanStats:
+	rm stats
+

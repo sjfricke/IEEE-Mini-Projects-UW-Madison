@@ -2,7 +2,6 @@
 -Make sure log in works correctly
     - Null when local server logs in 
 -Test 2 Pis concurrently
--Make sure running 10+ Pis in Lab room works
 -Document C code better
 -Fix MakeFile
     

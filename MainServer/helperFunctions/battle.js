@@ -12,69 +12,20 @@ var battleExport = module.exports = {
         var pokemon = model_f.getPokemonByName(player.mode.substr(1));
         
         switch(optionValue) {
-            case 1: //small attack
-                var attack = Math.floor(this.calculateAttack(player.baseAttack, pokemon.defence, 1));
-                
-                model_f.setHealth(pokemon.Name, pokemon.health - attack, function(result, err) {
-                    
-                    if (err) { return callback(-1, "MongoDB on server was not able to update"); }
-                    
-                    io.emit('modelUpdate', {"name" : pokemon.Name, "update" : { "health" : pokemon.health - attack } });
-
-                    if (result.health <= 0) {
-                        //killed pokemon
-                        if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
-                            player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value * .25)), "/updateScore") == -1 || 
-                            player_f.updatePlayerList(player.device, "coins", Math.floor(player.coins + (pokemon.value * .25)), "/updateCoins") == -1
-                           ) {
-                            return callback(-1, "MongoDB on Pi was not able to update");
-                        } else {
-                            //updates mode to all web viewers
-                            io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
-                            return callback( "You killed " + pokemon.displayName + " and got " + Math.floor(pokemon.value * .25) + " coins" );
-                        }
-
-                    } else {
-                        //didn't kill
-                        var attackBack = battleExport.calculateAttack(pokemon.attack, player.baseDefence, 1);
-                        if (player_f.updatePlayerList(player.device, "health", player.health - attackBack, "/updateHealth") == -1) {
-                            return callback(-1, "MongoDB on Pi was not able to update");
-                        } else {
-
-                            if (player.health <= 0) {
-                                //dead
-                                if (player_f.updatePlayerList(player.device, "health", 100, "/updateHealth") == -1 ||
-                                    player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1
-                                   ) {
-                                    return callback(-1, "MongoDB on Pi was not able to update");
-                                } else {
-                                    //updates mode to all web viewers
-                                    io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
-                                    return callback("You passed out, when you woke up, " + pokemon.displayName + " got away");
-                                }
-
-                            } else {
-                                //normal attack and back
-                                return callback("You did " + attack + " damage, but took " + attackBack + " damage and now only have " + player.health - attackBack + " health") ;
-                            }
-
-                        }
-                    }
-
-                });
-                
-                break;
-                
+            case 1: //small attack                
             case 2: //big attack
-                var attack = Math.floor(this.calculateAttack(player.baseAttack, pokemon.defence, 2));
                 
+                var attack = Math.floor(this.calculateAttack(player.baseAttack, pokemon.defence, optionValue));
+                console.log("debug");
+                console.dir(pokemon);
+                console.log(pokemon.health - attack);
                 model_f.setHealth(pokemon.Name, pokemon.health - attack, function(result, err) {
                     
                     if (err) { return callback(-1, "MongoDB on server was not able to update"); }
 
                     io.emit('modelUpdate', {"name" : pokemon.Name, "update" : { "health" : pokemon.health - attack } });
                     
-                    if (result.health <= 0) {
+                    if ((pokemon.health - attack) <= 0) {
                         //killed
                         if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
                             player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value * .25)), "/updateScore") == -1 ||
@@ -89,7 +40,7 @@ var battleExport = module.exports = {
 
                     } else {
                         //didn't kill
-                        var attackBack = battleExport.calculateAttack(pokemon.attack, player.baseDefence, 1);
+                        var attackBack =  Math.floor(battleExport.calculateAttack(pokemon.attack, player.baseDefence, optionValue)); //need to use battleExport cause 'this' isn't in scope
                         if (player_f.updatePlayerList(player.device, "health", player.health - attackBack, "/updateHealth") == -1) {
                             return callback(-1, "MongoDB on Pi was not able to update");
                         } else {
@@ -106,8 +57,9 @@ var battleExport = module.exports = {
                                 }
 
                             } else {
-                                //normal attack and back
-                                return callback("You did " + attack + " damage, but took " + attackBack + " damage and now only have " + player.health - attackBack + " health") ;
+                                //normal attack and back             
+                                
+                                return callback("Damage dealt: " + attack + "\n" + result.displayName + " health left: " + (pokemon.health - attack) + "\n\nDamage received: " + attackBack + "\nYou health left: " + player.health);
                             }
 
                         }

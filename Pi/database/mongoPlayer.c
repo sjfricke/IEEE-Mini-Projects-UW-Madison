@@ -2,20 +2,21 @@
 // Created by SpencerFricke on 8/17/2016.
 //
 
-#define playeOID "57b139404c69c7b65351adb0"
-
 #include "mongoPlayer.h"
 
 void updateNumberStatMongo(char** returnMessage, char* body) {
 
     char *bodyKey;
     char *bodyValue;
+    char *playerOID;
 
-    strtok (body," :"); //gets '{' from body
+    strtok (body," ,:"); //gets '{' from body
     //next call will get inner part
-    bodyKey = strtok (NULL," :");
-    bodyValue = strtok (NULL," :");
-
+    bodyKey = strtok (NULL," ,:");
+    bodyValue = strtok (NULL," ,:");
+    strtok (NULL," ,:"); //ignores oid key
+    playerOID = strtok (NULL," ,:");
+    
     mongoc_collection_t *collection;
     mongoc_client_t *client;
     bson_error_t error;
@@ -29,7 +30,7 @@ void updateNumberStatMongo(char** returnMessage, char* body) {
     client = mongoc_client_new ("mongodb://localhost:27017/");
     collection = mongoc_client_get_collection (client, "IEEE", "Player");
 
-    bson_oid_init_from_string (&oid, playeOID);
+    bson_oid_init_from_string (&oid, playerOID);
     query = BCON_NEW ("_id", BCON_OID(&oid));
     update = BCON_NEW ("$set", "{",
                        BCON_UTF8(bodyKey), BCON_INT32(atoi(bodyValue)),
@@ -62,11 +63,14 @@ void updateModeMongo(char** returnMessage, char* body) {
 
     char *bodyKey;
     char *bodyValue;
+    char *playerOID;
 
     strtok (body," :"); //gets '{' from body
     //next call will get inner part
     bodyKey = strtok (NULL," :");
     bodyValue = strtok (NULL," :");
+    strtok (NULL," ,:"); //ignores oid key
+    playerOID = strtok (NULL," ,:");
 
     mongoc_collection_t *collection;
     mongoc_client_t *client;
@@ -81,7 +85,7 @@ void updateModeMongo(char** returnMessage, char* body) {
     client = mongoc_client_new ("mongodb://localhost:27017/");
     collection = mongoc_client_get_collection (client, "IEEE", "Player");
 
-    bson_oid_init_from_string (&oid, playeOID);
+    bson_oid_init_from_string (&oid, playerOID);
     query = BCON_NEW ("_id", BCON_OID(&oid));
     update = BCON_NEW ("$set", "{",
                        BCON_UTF8(bodyKey), BCON_UTF8(bodyValue),

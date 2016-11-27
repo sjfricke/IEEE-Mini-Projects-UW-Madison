@@ -127,7 +127,7 @@ app.get('/login', function(req, res, next) {
     if (player == -1) {
         
         //check if Pi has its own player data
-        player_f.confirmPlayerData(2, "/player", device, "", "", function(data){
+        player_f.confirmPlayerData(2, "/player", device, "", "", "", function(data){
 
             if (data == "null") {            
                 //not logged in
@@ -205,7 +205,8 @@ app.get('/move/:direction', function(req, res, next) {
     //updates local copy
     player_f.updatePlayerListAsync(device, validMove.bodyKey, validMove.bodyValue, "/movePlayer", function(currentPlayer){
         
-        if (currentPlayer == -1) { return res.send("MongoDB on Pi was not able to update\nIs the runServer script going?\0"); }    
+        if (currentPlayer == -1) { return res.send("MongoDB on Pi was not able to update\nIs the runServer script going?\0"); }  
+        
         //updates player positions to all web viewers
         io.emit('movePlayer', {"x" : currentPlayer.x, "z" : currentPlayer.z, "device" : device}); 
 
@@ -348,7 +349,6 @@ app.get('/option/:value', function(req, res, next) {
                 
             //updates stats to all web viewers
             io.emit('playerUpdate', {"player" : player, "device" : device}); 
-            
             return res.send(optionResult + "\0");
             
         });

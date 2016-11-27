@@ -15,8 +15,16 @@ module.exports = {
     //will return player when done
     updatePlayerList: function(device, bodyKey, bodyValue, postURL) {
         var currentPlayer = -2; //returns if no players updated
+        var oid; 
+        // need to find mongo oid for player to update also needs to be sync so using for loop
+        for (var i = 0; i < _player.playerList.length; i++) {
+            if (_player.playerList[i].device == device){
+                oid = _player.playerList[i]["_id"]["$oid"];
+                break;
+            }
+        }
         
-        var confirm = this.confirmPlayerData(1, postURL, device, bodyKey, bodyValue);  
+        var confirm = this.confirmPlayerData(1, postURL, device, bodyKey, bodyValue, oid);  
         if (confirm == -1) { return -1; }
         
         _player.playerList.forEach(function(element, index){
@@ -36,8 +44,17 @@ module.exports = {
     updatePlayerListAsync: function(device, bodyKey, bodyValue, postURL, callback) {
         var currentPlayer = -2; //returns if no players updated
         
-        this.confirmPlayerData(1, postURL, device, bodyKey, bodyValue, function(confirm){
-            if (confirm == -1 || !confirm) { return callback(-1); }
+        var oid; 
+        // need to find mongo oid for player to update also needs to be sync so using for loop
+        for (var i = 0; i < _player.playerList.length; i++) {
+            if (_player.playerList[i].device == device){
+                oid = _player.playerList[i]["_id"]["$oid"];
+                break;
+            }
+        }
+        
+        this.confirmPlayerData(1, postURL, device, bodyKey, bodyValue, oid, function(confirm){
+            if (confirm == -1 || !confirm) { return callback(-1); } 
 
             _player.playerList.forEach(function(element, index){
 
@@ -277,7 +294,7 @@ module.exports = {
     },    
     
     //sends back data to Pi and will be able to validate the pi has been updated
-    confirmPlayerData: function(verb, postCall, device, bodyKey, bodyValue, callback){
+    confirmPlayerData: function(verb, postCall, device, bodyKey, bodyValue, oid, callback){
         var client = new net.Socket();
         client.setTimeout(2000);
         
@@ -287,7 +304,7 @@ module.exports = {
         else if (verb == 2) verbType = "GET";
         else verbType = "POST";
         
-        var raw_request = verbType + " " + postCall + " HTTP/1.1\n" + "{ " + bodyKey + " : " + bodyValue + " }\0";
+        var raw_request = verbType + " " + postCall + " HTTP/1.1\n" + "{ " + bodyKey + " : " + bodyValue + " , oid : " + oid + " }\0";
         var responseData = "";
         var errorOccured = false;
 
@@ -304,6 +321,16 @@ module.exports = {
 
         client.on('close', function() {
             console.log('Connection closed with device: ' + device);
+
+            //if data was not able to set in pi database
+            if (responseData == "Error Updated") {
+                if (callback) {                
+                    return callback(-1);
+                } else {                
+                    return -1;
+                }
+            }
+            
             //prevents an error from double sending
             if (!errorOccured) {
                 if (callback) {                

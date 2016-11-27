@@ -65,15 +65,18 @@ module.exports = {
     }, 
     
     //returns the pokemon from pokemonList by name
-    getPokemonByName : function(pokemonName){
-        var returnPokemon = -1; //returns if nothing found
+    getPokemonByName : function(pokemonName, callback){
         
-        _liveSpaces.pokemonList.forEach(function(element){
-            if (element.Name == pokemonName) {
-                returnPokemon = element;
-            }
+        ModelSchema.findOne({"Name" : pokemonName}, function (err, post) {
+
+            if (err) {
+                console.error(err);
+                return callback(false, err);
+            } else {
+                return callback(post); //return the only one found
+            }            
+
         });
         
-        return returnPokemon;
     }
 };

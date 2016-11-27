@@ -9,199 +9,199 @@ var battleExport = module.exports = {
     //returns (-1-invalid, 1-run, 2-died, 3-kill, 4-caught)
     option: function(player, optionValue, callback) {
                   
-        var pokemon = model_f.getPokemonByName(player.mode.substr(1));
-        
-        switch(optionValue) {
-            case 1: //small attack                
-            case 2: //big attack
-                
-                var attack = Math.floor(this.calculateAttack(player.baseAttack, pokemon.defence, optionValue));
-                console.log("debug");
-                console.dir(pokemon);
-                console.log(pokemon.health - attack);
-                model_f.setHealth(pokemon.Name, pokemon.health - attack, function(result, err) {
-                    
-                    if (err) { return callback(-1, "MongoDB on server was not able to update"); }
+        model_f.getPokemonByName(player.mode.substr(1), function(pokemon) {        
+        console.dir(pokemon);
+            if (pokemon == -1) return callback("Pokemon not found");
+            
+            switch(optionValue) {
+                case 1: //small attack                
+                case 2: //big attack
 
-                    io.emit('modelUpdate', {"name" : pokemon.Name, "update" : { "health" : pokemon.health - attack } });
+                    var attack = Math.floor(this.calculateAttack(player.baseAttack, pokemon.defence, optionValue));
                     
-                    if ((pokemon.health - attack) <= 0) {
-                        //killed
+                    model_f.setHealth(pokemon.Name, pokemon.health - attack, function(result, err) {
+
+                        if (err) { return callback(-1, "MongoDB on server was not able to update"); }
+
+                        io.emit('modelUpdate', {"name" : pokemon.Name, "update" : { "health" : pokemon.health - attack } });
+
+                        if ((pokemon.health - attack) <= 0) {
+                            //killed
+                            if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
+                                player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value * .25)), "/updateScore") == -1 ||
+                                player_f.updatePlayerList(player.device, "coins", Math.floor(player.coins + (pokemon.value * .25)), "/updateCoins") == -1
+                               ) {
+                                return callback(-1, "MongoDB on Pi was not able to update");
+                            } else {
+                                //updates mode to all web viewers
+                                io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
+                                return callback( "You killed " + pokemon.displayName + " and got " + Math.floor(pokemon.value * .25) + " coins" );
+                            }
+
+                        } else {
+                            //didn't kill
+                            var attackBack =  Math.floor(battleExport.calculateAttack(pokemon.attack, player.baseDefence, optionValue)); //need to use battleExport cause 'this' isn't in scope
+                            if (player_f.updatePlayerList(player.device, "health", player.health - attackBack, "/updateHealth") == -1) {
+                                return callback(-1, "MongoDB on Pi was not able to update");
+                            } else {
+
+                                if (player.health <= 0) {
+                                    //dead
+                                    if (player_f.updatePlayerList(player.device, "health", 100, "/updateHealth") == -1 ||
+                                        player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1) {
+                                        return callback(-1, "MongoDB on Pi was not able to update");
+                                    } else {
+                                        //updates mode to all web viewers
+                                        io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
+                                        return callback("You passed out, when you woke up, " + pokemon.displayName + " got away");
+                                    }
+
+                                } else {
+                                    //normal attack and back             
+
+                                    return callback("Damage dealt: " + attack + "\n" + result.displayName + " health left: " + (pokemon.health - attack) + "\n\nDamage received: " + attackBack + "\nYou health left: " + player.health);
+                                }
+
+                            }
+                        }
+
+                    });
+
+                    break;
+
+                case 3: //run
+
+                    if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1) {
+                        return callback(-1, "MongoDB on Pi was not able to update");
+                    } else {
+
+                        //updates mode to all web viewers
+                        io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
+
+                        model_f.setOnlineStatus(pokemon.Name, true, function(result, err){                        
+                            if (err) { return callback(-1, "MongoDB on server was not able to update"); }
+
+                            return callback( "You got away safely"); //ran away
+                        })
+
+                    }       
+
+                    break;
+
+                case 4: //pokeball
+                    if (player.items.Pokeball <= 0) { return callback("You are out of Pokeballs"); }
+
+                    if (this.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 1)) {
+                        //caught
                         if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
-                            player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value * .25)), "/updateScore") == -1 ||
-                            player_f.updatePlayerList(player.device, "coins", Math.floor(player.coins + (pokemon.value * .25)), "/updateCoins") == -1
+                            player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value)), "/updateScore") == -1 ||
+                            player_f.updatePlayerList(player.device, "coins", Math.floor(player.coins + (pokemon.value)), "/updateCoins") == -1 ||
+                            player_f.updatePlayerList(player.device, "items.Pokeball", player.items.Pokeball - 1, "/updateItem") == -1
                            ) {
                             return callback(-1, "MongoDB on Pi was not able to update");
                         } else {
                             //updates mode to all web viewers
                             io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
-                            return callback( "You killed " + pokemon.displayName + " and got " + Math.floor(pokemon.value * .25) + " coins" );
+                            return callback( "You caught " + pokemon.displayName + " and got " + (pokemon.value) + " coins!" );
                         }
 
-                    } else {
-                        //didn't kill
-                        var attackBack =  Math.floor(battleExport.calculateAttack(pokemon.attack, player.baseDefence, optionValue)); //need to use battleExport cause 'this' isn't in scope
-                        if (player_f.updatePlayerList(player.device, "health", player.health - attackBack, "/updateHealth") == -1) {
+                    } else {   
+                        //missed
+                        if (player_f.updatePlayerList(player.device, "items.Pokeball", player.items.Pokeball - 1, "/updateItem") == -1) {
                             return callback(-1, "MongoDB on Pi was not able to update");
                         } else {
+                            return callback("Aargh! Almost had it!");   
+                        }
 
-                            if (player.health <= 0) {
-                                //dead
-                                if (player_f.updatePlayerList(player.device, "health", 100, "/updateHealth") == -1 ||
-                                    player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1) {
-                                    return callback(-1, "MongoDB on Pi was not able to update");
-                                } else {
-                                    //updates mode to all web viewers
-                                    io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
-                                    return callback("You passed out, when you woke up, " + pokemon.displayName + " got away");
-                                }
 
-                            } else {
-                                //normal attack and back             
-                                
-                                return callback("Damage dealt: " + attack + "\n" + result.displayName + " health left: " + (pokemon.health - attack) + "\n\nDamage received: " + attackBack + "\nYou health left: " + player.health);
-                            }
+                    }
 
+                    break;
+
+                case 5: //Greatball
+                    if (player.items.Greatball <= 0) { return callback("You are out of Greatballs"); }
+
+                    if (this.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 2)) {
+
+                        if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
+                            player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value)), "/updateScore") == -1 ||
+                            player_f.updatePlayerList(player.device, "coins", Math.floor(player.coins + (pokemon.value)), "/updateCoins") == -1 ||
+                            player_f.updatePlayerList(player.device, "items.Greatball", player.items.Greatball - 1, "/updateItem") == -1
+                           ) {
+                            return callback(-1, "MongoDB on Pi was not able to update");
+                        } else {
+                            //updates mode to all web viewers
+                            io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
+                            return callback( "You caught " + pokemon.displayName + " and got " + (pokemon.value) + " coins!" );
+                        }
+
+                    } else {
+                        //missed
+                        if (player_f.updatePlayerList(player.device, "items.Greatball", player.items.Greatball - 1, "/updateItem") == -1) {
+                            return callback(-1, "MongoDB on Pi was not able to update");
+                        } else {
+                            return callback("Aargh! Almost had it!");   
                         }
                     }
+                    break;
 
-                });
-                
-                break;
-                
-            case 3: //run
-                
-                if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1) {
-                    return callback(-1, "MongoDB on Pi was not able to update");
-                } else {
-                    
-                    //updates mode to all web viewers
-                    io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
-                    
-                    model_f.setOnlineStatus(pokemon.Name, true, function(result, err){                        
-                        if (err) { return callback(-1, "MongoDB on server was not able to update"); }
-                        
-                        return callback( "You got away safely"); //ran away
-                    })
-                    
-                }       
-                
-                break;
-                
-            case 4: //pokeball
-                if (player.items.Pokeball <= 0) { return callback("You are out of Pokeballs"); }
-                
-                if (this.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 1)) {
-                    //caught
-                    if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
-                        player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value)), "/updateScore") == -1 ||
-                        player_f.updatePlayerList(player.device, "coins", Math.floor(player.coins + (pokemon.value)), "/updateCoins") == -1 ||
-                        player_f.updatePlayerList(player.device, "items.Pokeball", player.items.Pokeball - 1, "/updateItem") == -1
+                case 6: //Ultraball
+                    if (player.items.Ultraball <= 0) { return callback("You are out of Ultraballs"); }
+
+                    if (this.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 3)) {
+
+                        if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
+                            player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value)), "/updateScore") == -1 ||
+                            player_f.updatePlayerList(player.device, "coins", Math.floor(player.coins + (pokemon.value)), "/updateCoins") == -1 ||
+                            player_f.updatePlayerList(player.device, "items.Ultraball", player.items.Ultraball - 1, "/updateItem") == -1
+                           ) {
+                            return callback(-1, "MongoDB on Pi was not able to update");
+                        } else {
+                            //updates mode to all web viewers
+                            io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
+                            return callback( "You caught " + pokemon.displayName + " and got " + (pokemon.value) + " coins!" );
+                        }
+
+                    } else {
+                        //missed
+                        if (player_f.updatePlayerList(player.device, "items.Ultraball", player.items.Ultraball - 1, "/updateItem") == -1) {
+                            return callback(-1, "MongoDB on Pi was not able to update");
+                        } else {
+                            return callback("Aargh! Almost had it!");   
+                        }
+                    }
+                    break;
+
+                case 7: //potion
+                    if (player.items.Potion <= 0) { return callback("You are out of Potions"); }
+
+                    var newHealth = player.health + 25;
+                    if (newHealth > 100) {newHealth = 100;}
+
+                    if (player_f.updatePlayerList(player.device, "health", newHealth, "/updateHealth")  == -1 ||
+                        player_f.updatePlayerList(player.device, "items.Potion", player.items.Potion - 1, "/updateItem") == -1) {
+                        return callback(-1, "MongoDB on Pi was not able to update");
+                    } else {
+                        return callback ( "You healed your health to " + newHealth + " with the Potion");
+                    }  
+                    break;
+
+                case 8: //super potion
+                    if (player.items.SuperPotion <= 0) { return callback("You are out of Super Potions"); }
+
+                    var newHealth = player.health + 50;
+                    if (newHealth > 100) {newHealth = 100;}
+
+                    if (player_f.updatePlayerList(player.device, "health", newHealth, "/updateHealth")  == -1 ||
+                        player_f.updatePlayerList(player.device, "items.SuperPotion", player.items.SuperPotion - 1, "/updateItem") == -1
                        ) {
                         return callback(-1, "MongoDB on Pi was not able to update");
                     } else {
-                        //updates mode to all web viewers
-                        io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
-                        return callback( "You caught " + pokemon.displayName + " and got " + (pokemon.value) + " coins!" );
-                    }
-                    
-                } else {   
-                    //missed
-                    if (player_f.updatePlayerList(player.device, "items.Pokeball", player.items.Pokeball - 1, "/updateItem") == -1) {
-                        return callback(-1, "MongoDB on Pi was not able to update");
-                    } else {
-                        return callback("Aargh! Almost had it!");   
-                    }
-                    
-                                     
-                }
-                
-                break;
-                
-            case 5: //Greatball
-                if (player.items.Greatball <= 0) { return callback("You are out of Greatballs"); }
-                
-                if (this.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 2)) {
-                    
-                    if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
-                        player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value)), "/updateScore") == -1 ||
-                        player_f.updatePlayerList(player.device, "coins", Math.floor(player.coins + (pokemon.value)), "/updateCoins") == -1 ||
-                        player_f.updatePlayerList(player.device, "items.Greatball", player.items.Greatball - 1, "/updateItem") == -1
-                       ) {
-                        return callback(-1, "MongoDB on Pi was not able to update");
-                    } else {
-                        //updates mode to all web viewers
-                        io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
-                        return callback( "You caught " + pokemon.displayName + " and got " + (pokemon.value) + " coins!" );
-                    }
-                    
-                } else {
-                    //missed
-                    if (player_f.updatePlayerList(player.device, "items.Greatball", player.items.Greatball - 1, "/updateItem") == -1) {
-                        return callback(-1, "MongoDB on Pi was not able to update");
-                    } else {
-                        return callback("Aargh! Almost had it!");   
-                    }
-                }
-                break;
-                
-            case 6: //Ultraball
-                if (player.items.Ultraball <= 0) { return callback("You are out of Ultraballs"); }
-                
-                if (this.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 3)) {
-                    
-                    if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
-                        player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value)), "/updateScore") == -1 ||
-                        player_f.updatePlayerList(player.device, "coins", Math.floor(player.coins + (pokemon.value)), "/updateCoins") == -1 ||
-                        player_f.updatePlayerList(player.device, "items.Ultraball", player.items.Ultraball - 1, "/updateItem") == -1
-                       ) {
-                        return callback(-1, "MongoDB on Pi was not able to update");
-                    } else {
-                        //updates mode to all web viewers
-                        io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
-                        return callback( "You caught " + pokemon.displayName + " and got " + (pokemon.value) + " coins!" );
-                    }
-                    
-                } else {
-                    //missed
-                    if (player_f.updatePlayerList(player.device, "items.Ultraball", player.items.Ultraball - 1, "/updateItem") == -1) {
-                        return callback(-1, "MongoDB on Pi was not able to update");
-                    } else {
-                        return callback("Aargh! Almost had it!");   
-                    }
-                }
-                break;
-                
-            case 7: //potion
-                if (player.items.Potion <= 0) { return callback("You are out of Potions"); }
-                
-                var newHealth = player.health + 25;
-                if (newHealth > 100) {newHealth = 100;}
-                
-                if (player_f.updatePlayerList(player.device, "health", newHealth, "/updateHealth")  == -1 ||
-                    player_f.updatePlayerList(player.device, "items.Potion", player.items.Potion - 1, "/updateItem") == -1) {
-                    return callback(-1, "MongoDB on Pi was not able to update");
-                } else {
-                    return callback ( "You healed your health to " + newHealth + " with the Potion");
-                }  
-                break;
-                
-            case 8: //super potion
-                if (player.items.SuperPotion <= 0) { return callback("You are out of Super Potions"); }
-                
-                var newHealth = player.health + 50;
-                if (newHealth > 100) {newHealth = 100;}
-                
-                if (player_f.updatePlayerList(player.device, "health", newHealth, "/updateHealth")  == -1 ||
-                    player_f.updatePlayerList(player.device, "items.SuperPotion", player.items.SuperPotion - 1, "/updateItem") == -1
-                   ) {
-                    return callback(-1, "MongoDB on Pi was not able to update");
-                } else {
-                    return callback ( "You healed your health to " + newHealth + " with the Super Potion");
-                }  
-                break;
-        }
-        
+                        return callback ( "You healed your health to " + newHealth + " with the Super Potion");
+                    }  
+                    break;
+            }
+         });
     },
     //firgures out the attack asserted and returns it
     calculateAttack: function (attack, defence, boost) {

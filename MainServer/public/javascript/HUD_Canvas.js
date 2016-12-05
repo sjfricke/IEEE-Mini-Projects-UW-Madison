@@ -36,7 +36,7 @@ function redrawHealthBar() {
     // Calculate health bar percent
     var percentPokemon = healthPokemon.health / healthPokemon.maxHealth;
     var percentPlayer = playerStats.health / healthPlayer.maxHealth;
-
+    
     //draws health boxs using 2D web canvas strats
     context.fillStyle = "black";
     context.fillRect(healthPokemon.x, healthPokemon.y, healthPokemon.width, healthPokemon.height);

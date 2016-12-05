@@ -170,6 +170,7 @@ function init_map() {
         //adds name above player
         //space hack due to THREE.js r64 change to sprite alignment       
         var spritey = makeTextSprite( "                       Player " + element.device );
+        spritey.name = "playerSprite" + element.device;
         spritey.position.set(element.x, 6,element.z );
         scene_map.add( spritey );
         
@@ -177,7 +178,7 @@ function init_map() {
         if (element.device == deviceID) {
             
             //this will allow us to move the sprite name with the player
-            spritey.name = "playerSprite"; 
+            //spritey.name = "playerSprite"; 
             
             playerStats = element; //gathers player's inital stats
             updateStats(playerStats); //updates the canvas text
@@ -213,10 +214,15 @@ function movePlayer(xVal, zVal, objectName) {
     
     var modelMoving = scene_map.getObjectByName(objectName);
     
+    var differenceX = modelMoving.position.x - xVal;
+    var differenceZ = modelMoving.position.z - zVal;
+    
     modelMoving.position.x = xVal;
     modelMoving.position.z = zVal;     
     
     if (modelMoving == playerModel) {
         controls_map.target = playerModel.position; //sets the aim of the orbit control for user player model
+        camera_map.position.x -= differenceX;
+        camera_map.position.z -= differenceZ;
     }
 }

@@ -10,14 +10,13 @@ var battleExport = module.exports = {
     option: function(player, optionValue, callback) {
                   
         model_f.getPokemonByName(player.mode.substr(1), function(pokemon) {        
-        console.dir(pokemon);
             if (pokemon == -1) return callback("Pokemon not found");
             
             switch(optionValue) {
                 case 1: //small attack                
                 case 2: //big attack
 
-                    var attack = Math.floor(this.calculateAttack(player.baseAttack, pokemon.defence, optionValue));
+                    var attack = Math.floor(battleExport.calculateAttack(player.baseAttack, pokemon.defence, optionValue));
                     
                     model_f.setHealth(pokemon.Name, pokemon.health - attack, function(result, err) {
 
@@ -47,13 +46,20 @@ var battleExport = module.exports = {
 
                                 if (player.health <= 0) {
                                     //dead
+                                    var newScore = Math.floor(player.score * .80); //lose 20% of score on death
+                                    if (newScore < 0) player.score = 0;
                                     if (player_f.updatePlayerList(player.device, "health", 100, "/updateHealth") == -1 ||
-                                        player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1) {
+                                        player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
+                                        player_f.updatePlayerList(player.device, "z", 4, "/movePlayer") == -1 ||
+                                        player_f.updatePlayerList(player.device, "score", newScore, "/updateScore") == -1 ||
+                                        player_f.updatePlayerList(player.device, "x", -4, "/movePlayer") == -1) {
                                         return callback(-1, "MongoDB on Pi was not able to update");
                                     } else {
-                                        //updates mode to all web viewers
+                                        //updates mode to all web viewers when player dies
                                         io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
-                                        return callback("You passed out, when you woke up, " + pokemon.displayName + " got away");
+                                        io.emit('modelUpdate', {"name" : pokemon.Name, "update" : { "liveOn" : true } }); //pokemon appears to other players
+                                        io.emit('movePlayer', {"x" : -4, "z" : 4, "device" : player.device}); 
+                                        return callback("You passed out, when you woke up, " + pokemon.displayName + " got away\nYou also lost some points it looks like\nBe more careful out there, these are wild pokemon you are dealing with!");
                                     }
 
                                 } else {
@@ -77,6 +83,9 @@ var battleExport = module.exports = {
 
                         //updates mode to all web viewers
                         io.emit('modeUpdate', {"mode" : "0", "device" : player.device}); 
+                        
+                        //pokemon reappears
+                        io.emit('modelUpdate', {"name" : pokemon.Name, "update" : { "liveOn" : true } });
 
                         model_f.setOnlineStatus(pokemon.Name, true, function(result, err){                        
                             if (err) { return callback(-1, "MongoDB on server was not able to update"); }
@@ -91,7 +100,7 @@ var battleExport = module.exports = {
                 case 4: //pokeball
                     if (player.items.Pokeball <= 0) { return callback("You are out of Pokeballs"); }
 
-                    if (this.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 1)) {
+                    if (battleExport.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 1)) {
                         //caught
                         if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
                             player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value)), "/updateScore") == -1 ||
@@ -121,7 +130,7 @@ var battleExport = module.exports = {
                 case 5: //Greatball
                     if (player.items.Greatball <= 0) { return callback("You are out of Greatballs"); }
 
-                    if (this.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 2)) {
+                    if (battleExport.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 2)) {
 
                         if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
                             player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value)), "/updateScore") == -1 ||
@@ -148,7 +157,7 @@ var battleExport = module.exports = {
                 case 6: //Ultraball
                     if (player.items.Ultraball <= 0) { return callback("You are out of Ultraballs"); }
 
-                    if (this.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 3)) {
+                    if (battleExport.calculateCatch(pokemon.health, pokemon.baseHealth, pokemon.catchFactor, 3)) {
 
                         if (player_f.updatePlayerList(player.device, "mode", "0", "/updateMode") == -1 ||
                             player_f.updatePlayerList(player.device, "score", Math.floor(player.score + (pokemon.value)), "/updateScore") == -1 ||

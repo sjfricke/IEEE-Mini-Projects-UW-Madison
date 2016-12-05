@@ -12,7 +12,7 @@ socket.on('connect', function(data) {
 //socket message for updates to player movement
 socket.on('movePlayer', function(data){ 
     movePlayer(data.x, data.z, ("player" + data.device));  //moves player
-    movePlayer(data.x, data.z, ("playerSprite")); //moves player sprite above them
+    movePlayer(data.x, data.z, ("playerSprite" + data.device)); //moves player sprite above them
 });
 
 //used to handle differnt mode
@@ -45,6 +45,7 @@ socket.on('modeUpdate', function(data){
 socket.on('playerUpdate', function(data){ 
     if (data.device == deviceID) {       
         updateStats(data.player);
+        playerStats = data.player;
         redrawHealthBar(); //incase player health changed
     }
 });
@@ -67,6 +68,26 @@ socket.on('modelUpdate', function(data){
     
     
     
+});
+
+//adding new player to field
+socket.on('newPlayer', function(data){ 
+    _player.push(data.player);
+    
+    //gets player model
+    var object = loadList[0].clone(); //0 is the id for player model
+
+    object.name = "player" + data.player.device;
+    object.position.set(data.player.x, 0, data.player.z);
+    object.scale.set(.5, .5, .5);
+    scene_map.add( object );
+
+    //adds name above player
+    //space hack due to THREE.js r64 change to sprite alignment       
+    var spritey = makeTextSprite( "                       Player " + data.player.device );
+    spritey.name = "playerSprite" + data.player.device;
+    spritey.position.set(data.player.x, 6,data.player.z );
+    scene_map.add( spritey );
 });
 
 //io.emit('playerUpdate', {"player" : currentPlayer, "device" : device}); 

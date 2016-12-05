@@ -118,7 +118,7 @@ app.use('/api', api); //sets the API used to access the Database
 //used to help server know which device IDs are actually being used instead of scanning all 256
 app.get('/login', function(req, res, next) {
     var device = parseInt( req.ip.split(/[.]+/).pop() );
-    
+    var playURL = localIP + ":8000/player/" + device;
     console.log("Log In request from Device: " + device);     
     
     var player = player_f.checkForPlayer(device, _player.playerList);
@@ -139,7 +139,8 @@ app.get('/login', function(req, res, next) {
             } else {
 
                 _player.playerList.push(JSON.parse(data));
-
+                io.emit('newPlayer', {"player" : JSON.parse(data)}); //so new player shows on screen
+               
                 //adds to database
                 MongoClient.connect(mongoURI, function(err, db) {
                     assert.equal(null, err);
@@ -148,13 +149,12 @@ app.get('/login', function(req, res, next) {
                       db.close();
                   });
                 });
-
-                    return res.send("All ready to catch'em all!\n\0");
+                    return res.send("All ready to catch'em all!\nGo to: "+ playURL +"\0");
             }
         }); //confirm player data
         
     } else {
-        return res.send("All ready logged in!\n\0");
+        return res.send("All ready logged in!\nGo to: "+ playURL +"\0");
     }     
        
 });
@@ -235,7 +235,7 @@ app.get('/move/:direction', function(req, res, next) {
 
                         if (statusResult == -1) { return res.send("ERROR [3.0.1]\0"); }//no Pokeball by Name found 
 
-                        io.emit('modelUpdate', {"name" : modelResult.Name, "update" : "liveOff"}); //notifies all web clients
+                        io.emit('modelUpdate', {"name" : modelResult.Name, "update" : { "liveOff" : true }}); //notifies all web clients
 
                         return res.send("Pokeball!\0"); 
                     });   
@@ -324,6 +324,7 @@ app.get('/option/:value', function(req, res, next) {
     //checks for valid number sent
     try {
         var optionValue = parseInt(req.params.value);
+        if (optionValue == NaN || optionValue > 10 || optionValue <= -1) return res.send("No non-numbers in option choice\0");
     } catch(e) {
         return res.send("No non-numbers in option choice\0");
     }

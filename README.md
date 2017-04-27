@@ -1,5 +1,7 @@
 # IEEE_RasberryPi_Socket_Pokemon
 
+The 2016 IEEE Fall Mini-Project Repo. All information is broken into 3 main folders with details below. Any questions please contact Spencer at sjfricke.at.wisc.edu
+
 # Folder Breakdown
 
 - **MainServer** all the backend server code and front end graphic code

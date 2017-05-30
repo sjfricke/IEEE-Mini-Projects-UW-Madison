@@ -26,4 +26,6 @@ int httpServer(http_t *http);
 
 void* httpDaemon(void *config);
 
+void findRoute(const char* request, char** route);
+
 #endif

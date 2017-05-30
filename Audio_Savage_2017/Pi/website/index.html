@@ -1,8 +1,19 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <title>IEEE Audio Savage</title>
+    <title>IEEE Audio Savage</title>    
   </head>
   <body>
     <h1>wubalubadubdub</h1>
   </body>
+
+  <script src="jquery.min.js"> </script>
+    
+  <script> 
+  	window.addEventListener('keydown', function(event) { 
+  		$.get( "/key/" + event.keyCode, function( data ) {
+		  console.log(data);
+		});
+  	})
+  </script>
 </html>

@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define WEBSITE_FOLDER "website/"
+#define WEBSITE_FOLDER "website"
 
 // Takes a string and length and sets it to RFC 1123 Date Format for HTTP Response
 void getTime(char** timestamp, int length);

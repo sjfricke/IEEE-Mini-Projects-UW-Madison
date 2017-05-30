@@ -23,7 +23,8 @@ int getHTML(char* file, char** html, int length) {
   file_p = fopen(file_path, "r");
 
   if (file_p == NULL) {
-    perror("Error");
+    return -1;
+    //perror("Error");
   }
   
   // gets lenght of file and resets

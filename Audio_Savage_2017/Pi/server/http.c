@@ -31,11 +31,11 @@ void* httpDaemon(void *config) {
   char* msg_receive = malloc(sizeof(char) * 4096); //4096 char max for data
   int msg_size;
   char* msg_callback = malloc(sizeof(char) * 4096);
-  char* msg_return = malloc(sizeof(char) * 4096);
-
+  char* msg_return = malloc(sizeof(char) * 131072);
+  char* route = malloc(sizeof(char) * 128);
   char* timestamp = malloc(sizeof(char) * 256);
   int content_length;
-  char* html = malloc(sizeof(char) * 4096);
+  char* html = malloc(sizeof(char) * 131072);
   
   //--------------------------------//
   //       Configure TCP Socket     //
@@ -87,27 +87,55 @@ void* httpDaemon(void *config) {
   //--------------------------------//
   
   while(socket_con) {
-    sprintf(msg_callback, "Incoming connection from %s - sending welcome\n", inet_ntoa(client.sin_addr));
 
-    ((http_t*)config)->response(msg_callback);
-
-    // HTTP Request - Need to handle it accordingly
-    
     msg_size = recv(socket_con, msg_receive, 4096, 0);
     //printf("message of %d bytes:\n%s\n", msg_size, msg_receive);
     //printf("--------------------------\n");
+    
+    sprintf(msg_callback, "Incoming connection from %s - sending welcome\n", inet_ntoa(client.sin_addr));
 
+    // HTTP Request - Need to handle it accordingly
+    
+    if (strncmp(msg_receive, "GET", 3) == 0) { //GET Request
+
+      findRoute(msg_receive, &route);
+
+      //      get_FindMethod(route, &returnMsg);
+
+    } else if (strncmp(msg_receive, "POST", 4) == 0) { //POST Request
+      //printf("POST \n");
+      //findRoute(msg_receive, &route);
+      //printf("Route: %s\n", route);
+      //findBody(msg_receive, &postBody);
+      //post_FindMethod(route, &returnMsg, postBody);
+
+    } else { //something not GET or POST
+      //printf("NONE \n");
+      strcpy(msg_return, "HTTP Method not supported");
+    }
+    
     memset(msg_receive, 0, msg_size); //clears receive message
 
     // HTTP Reponse - Need to format string
 
-    getTime(&timestamp, 256);
+    
+    if (strncmp(route, "/key/", 5) == 0) {
 
-    printf("time: %s\n", timestamp);
-    content_length = getHTML("index.html", &html, 4096);
-    //    strcpy(html, "<html><head><title>IEEE Audio Savage</title></head><body>Hello World</body></html>");
-    printf("%s \n%d\n", html, content_length);
-    sprintf(msg_return, "HTTP/1.1 200 OK\r\nCache-Control: no-cache, private\r\nContent-Length: %i\r\nDate: %s\r\n\r\n%s", content_length, timestamp, html);
+      ((http_t*)config)->response(route + 5);
+      strcpy(msg_return, "Key Received");
+
+    } else {
+      
+      getTime(&timestamp, 256);
+      content_length = getHTML(route, &html, 131072);
+
+      if (content_length < 0) {
+	sprintf(msg_return, "HTTP/1.1 400 OK\r\nCache-Control: no-cache, private\r\nDate: %s\r\n\r\n", timestamp);
+      } else {
+	sprintf(msg_return, "HTTP/1.1 200 OK\r\nCache-Control: no-cache, private\r\nContent-Length: %i\r\nDate: %s\r\n\r\n%s", content_length, timestamp, html);
+      }
+      
+    }
     
     send(socket_con, msg_return, strlen(msg_return), 0);
 
@@ -120,4 +148,24 @@ void* httpDaemon(void *config) {
 
   pthread_exit(NULL);
   
+}
+
+void findRoute(const char* request, char** route) {
+    int end_index = 0;
+    char *route_str;
+
+    //finds when the route starts
+    route_str = strstr(request, "/");
+
+    //finds when the route ends
+    while (route_str[end_index] != ' ') {
+        end_index++;
+    }
+
+    //copies route from message to reference string
+    strncpy(*route, route_str, end_index);
+
+    //ends the string so if a shorter string is passed then last route otherwise previous longer strings will remain
+    strcpy(*route + end_index, "\0");
+
 }

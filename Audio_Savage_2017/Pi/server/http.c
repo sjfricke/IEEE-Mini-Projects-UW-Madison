@@ -21,14 +21,25 @@ int httpServer(http_t *http) {
 
 void* httpDaemon(void *config) {
 
+  //--------------------------------//
+  //         Variable Setup         //
+  //--------------------------------//
+  
   int status; // used to check status of c functions return values
   int port = ((http_t*)config)->port;
 
-  //  char* msg_return = malloc(sizeof(char) * 4096);
-  char* msg_return = "HTTP/1.1 200 OK\r\nCache-Control: no-cache, private\r\nContent-Length: 82\r\nDate: Mon, 29 May 2017 10:21:21 GMT\r\n\r\n<html><head><title>IEEE Audio Savage</title></head><body>Hello World</body></html>";
   char* msg_receive = malloc(sizeof(char) * 4096); //4096 char max for data
   int msg_size;
   char* msg_callback = malloc(sizeof(char) * 4096);
+  char* msg_return = malloc(sizeof(char) * 4096);
+
+  char* timestamp = malloc(sizeof(char) * 256);
+  int content_length;
+  char* html = malloc(sizeof(char) * 4096);
+  
+  //--------------------------------//
+  //       Configure TCP Socket     //
+  //--------------------------------//
   
   struct sockaddr_in client;    // socket info about the machine connecting to us
   struct sockaddr_in server;    // socket info about our server
@@ -65,19 +76,22 @@ void* httpDaemon(void *config) {
     printf("Socket Binded!\n");
   }
 
-  getTime(&msg_callback, 4096);
-  printf("GETTIME %s\n", msg_callback);
-  
   // start listening, allowing a queue of up to 10 pending connection
   listen(socket_fp, 10);
   printf("Socket Listening on port %d!\n\n", port);
   //blocking for response
   socket_con = accept(socket_fp, (struct sockaddr *)&client, &socket_size);
+
+  //--------------------------------//
+  //      HTTP Server Polling       //
+  //--------------------------------//
   
   while(socket_con) {
     sprintf(msg_callback, "Incoming connection from %s - sending welcome\n", inet_ntoa(client.sin_addr));
 
     ((http_t*)config)->response(msg_callback);
+
+    // HTTP Request - Need to handle it accordingly
     
     msg_size = recv(socket_con, msg_receive, 4096, 0);
     //printf("message of %d bytes:\n%s\n", msg_size, msg_receive);
@@ -85,6 +99,16 @@ void* httpDaemon(void *config) {
 
     memset(msg_receive, 0, msg_size); //clears receive message
 
+    // HTTP Reponse - Need to format string
+
+    getTime(&timestamp, 256);
+
+    printf("time: %s\n", timestamp);
+    content_length = getHTML("index.html", &html, 4096);
+    //    strcpy(html, "<html><head><title>IEEE Audio Savage</title></head><body>Hello World</body></html>");
+    printf("%s \n%d\n", html, content_length);
+    sprintf(msg_return, "HTTP/1.1 200 OK\r\nCache-Control: no-cache, private\r\nContent-Length: %i\r\nDate: %s\r\n\r\n%s", content_length, timestamp, html);
+    
     send(socket_con, msg_return, strlen(msg_return), 0);
 
     close(socket_con);

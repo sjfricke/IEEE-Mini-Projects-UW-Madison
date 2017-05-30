@@ -11,11 +11,14 @@ int main ( int argc, char* argv[] ) {
   int status;
   http_t http;
 
+  // set port of server
+  http.port = 8000;
+  
+  // set function to receive actions
   http.response = onResponse;
 
-  status = httpServer(&http);
-  printf("Status: %d\n", status);
-  printf("value: %d\n", http.port);
+  // start server
+  httpServer(&http);
 
   while(1){}
 }

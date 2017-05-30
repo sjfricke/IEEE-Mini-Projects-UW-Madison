@@ -1,24 +1,21 @@
 //Use netstat -ant|grep <PORT> | awk '{print$6}'    -to check status of socket if in TIME_WAIT
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "server/server.h" 
 
 void onResponse( char* response ) {
-  printf("%s\n", response);
+  printf("CALLBACK: %s\n", response);
 }
 
 int main ( int argc, char* argv[] ) {
 
   int status;
-  HTTP myHttp;
+  http_t http;
 
-  myHttp.response = onResponse;
-  myHttp.value = 0;
+  http.response = onResponse;
 
-  status = httpServer(&myHttp);
+  status = httpServer(&http);
   printf("Status: %d\n", status);
-  printf("value: %d\n", myHttp.value);
+  printf("value: %d\n", http.port);
+
+  while(1){}
 }

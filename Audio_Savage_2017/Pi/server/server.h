@@ -1,6 +1,13 @@
 #ifndef __SERVER_H__
 #define __SERVER_H__
 
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <signal.h>
+
 #include "http.h"
 #include "websocket.h"
 

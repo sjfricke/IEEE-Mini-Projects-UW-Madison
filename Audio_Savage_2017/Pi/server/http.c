@@ -1,5 +1,11 @@
 #include "http.h"
 
-int httpServer(void) {
-  return 22;
+int httpServer(HTTP *httpObject) {
+
+  char* test = "test";
+  
+  httpObject->value = 5;
+  httpObject->response(test);
+
+  return 0;
 }

@@ -25,7 +25,7 @@ void* httpDaemon(void *config) {
   int port = ((http_t*)config)->port;
 
   //  char* msg_return = malloc(sizeof(char) * 4096);
-  char* msg_return = "HTTP/1.1 200 OK\r\nCache-Control: no-cache, private\r\nContent-Length: 107\r\nDate: Mon, 24 Nov 2014 10:21:21 GMT\r\n\r\n";
+  char* msg_return = "HTTP/1.1 200 OK\r\nCache-Control: no-cache, private\r\nContent-Length: 82\r\nDate: Mon, 29 May 2017 10:21:21 GMT\r\n\r\n<html><head><title>IEEE Audio Savage</title></head><body>Hello World</body></html>";
   char* msg_receive = malloc(sizeof(char) * 4096); //4096 char max for data
   int msg_size;
   char* msg_callback = malloc(sizeof(char) * 4096);
@@ -65,9 +65,12 @@ void* httpDaemon(void *config) {
     printf("Socket Binded!\n");
   }
 
+  getTime(&msg_callback, 4096);
+  printf("GETTIME %s\n", msg_callback);
+  
   // start listening, allowing a queue of up to 10 pending connection
   listen(socket_fp, 10);
-  printf("Socket Listening on port %d!\n", port);
+  printf("Socket Listening on port %d!\n\n", port);
   //blocking for response
   socket_con = accept(socket_fp, (struct sockaddr *)&client, &socket_size);
   
@@ -77,8 +80,8 @@ void* httpDaemon(void *config) {
     ((http_t*)config)->response(msg_callback);
     
     msg_size = recv(socket_con, msg_receive, 4096, 0);
-    printf("message of %d bytes:\n%s\n", msg_size, msg_receive);
-    printf("--------------------------\n");
+    //printf("message of %d bytes:\n%s\n", msg_size, msg_receive);
+    //printf("--------------------------\n");
 
     memset(msg_receive, 0, msg_size); //clears receive message
 
@@ -86,8 +89,8 @@ void* httpDaemon(void *config) {
 
     close(socket_con);
 
-    printf("waiting for next request\n");
-    printf("--------------------------\n");
+    //printf("waiting for next request\n");
+    //printf("--------------------------\n");
     socket_con = accept(socket_fp, (struct sockaddr *)&client, &socket_size);
   }
 

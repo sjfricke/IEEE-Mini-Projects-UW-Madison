@@ -1,16 +1,14 @@
 CC = gcc
 CFLAGS = -Wall -Werror -c
+OBJ = server/util.o server/websocket.o server/http.o
 
 main: server
-	$(CC) server/websocket.o server/http.o main.c -lpthread -o Audio_Savage
+	$(CC) $(OBJ) main.c -lpthread -o Audio_Savage
 
-server: server/http.o server/websocket.o
+server: $(OBJ)
 
-http.o: server/http.c
-	$(CC) -Wall -Werror -c -lpthread server/http.c -o server/http.o
-
-websocket.o: server/websocket.c
-	$(CC) $(CFLAGS) server/websocket.c -o server/websocket.o
+server/%.o: server/%.c
+	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
 	rm server/*.o

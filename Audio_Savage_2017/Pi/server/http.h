@@ -12,6 +12,8 @@
 #include <signal.h>
 #include <pthread.h>
 
+#include "util.h"
+
 typedef void (*callback)(char*);
 typedef void (*callbackInt)(int*);
 
